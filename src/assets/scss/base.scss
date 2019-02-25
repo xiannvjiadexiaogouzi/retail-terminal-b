@@ -1,0 +1,91 @@
+// 媒体查询
+$iwidth:1920px;
+
+/*>=1024的设备*/
+@media screen and (min-device-width: 1024px) {
+    html {
+        // transform: scale(0.53);
+        // transform-origin: 0 0;
+        zoom: 0.53;
+    }
+
+    div.login-bg {
+        zoom: 1.89;
+    }
+}
+
+/*>=1280的设备*/
+@media screen and (min-device-width: 1280px) {
+    html {
+        // transform: scale(0.67);
+        // transform-origin: 0 0;
+        zoom: 0.67;
+    }
+
+    div.login-bg {
+        zoom: 1.49;
+    }
+
+}
+
+/*>=1366的设备*/
+@media screen and (min-device-width: 1366px) {
+    // html {
+    //     // transform: scale(0.71);
+    //     // transform-origin: 0 0;
+    //     zoom: 0.71;
+    // }
+
+    // div.login-bg {
+    //     zoom: 1.4;
+    // }
+    .search-bar .el-input {
+        input {
+            width: 100px;
+        }
+    }
+}
+
+/*>=1440的设备*/
+@media screen and (min-device-width: 1440px) {
+    // html {
+    //     // transform: scale(0.75);
+    //     // transform-origin: 0 0;
+    //     zoom: 0.75;
+    // }
+
+    // div.login-bg {
+    //     zoom: 1.33;
+    // }
+    .search-bar .el-input {
+        width: 100px;
+    }
+
+}
+
+/*>=1680的设备*/
+@media screen and (min-device-width: 1680px) {
+    html {
+        // transform: scale(0.875);
+        // transform-origin: 0 0;
+        zoom: 0.875;
+    }
+
+    div.login-bg {
+        zoom: 1.14;
+    }
+
+}
+
+/*>=1920的设备*/
+@media screen and (min-device-width: 1920px) {
+    html {
+        // transform: scale(1);
+        // transform-origin: 0 0;
+        zoom: 1;
+    }
+
+    div.login-bg {
+        // transform: scale(1.875);
+    }
+}
