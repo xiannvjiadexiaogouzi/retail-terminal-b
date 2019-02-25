@@ -1,6 +1,10 @@
 # retail-terminal-b
 使用VUE做的后台管理系统
 
+![image](https://github.com/xiannvjiadexiaogouzi/retail-terminal-b/blob/master/src/assets/gif/Jietu20190225211142.gif)
+
+
+![image](https://github.com/xiannvjiadexiaogouzi/retail-terminal-b/blob/master/src/assets/gif/Jietu20190225212712.gif)
 
 ## Project setup
 ```
