@@ -1,4 +1,6 @@
 # retail-terminal-b
+使用VUE做的后台管理系统
+
 
 ## Project setup
 ```
