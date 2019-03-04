@@ -17,18 +17,18 @@
         </div>
       </div>
       <div class="avatar-status-wrapper">
-        <div class="avatar-wrapper" @click="adminShow">
+        <div class="avatar-wrapper" @mouseover="showAdmin=true">
           <span class="icon-avatar"/>
           <span class="avatar-name">admin</span>
         </div>
-        <div class="admin-info-wrapper" v-if="showAdmin">
+        <div class="admin-info-wrapper" v-if="showAdmin" @mouseover="showAdmin=true" @mouseout="showAdmin=false">
           <admin-info/>
         </div>
         <div class="status-wrapper">
           <span class="icon-home" @click="$router.push('/index/sys-index')"/>
-          <span class="icon-msg" @click="msgShow"/>
+          <span class="icon-msg" @mouseover="showMsg=true"/>
           <div class="msg-warn">50</div>
-          <div class="new-message-wrapper" v-show="showMsg">
+          <div class="new-message-wrapper" v-show="showMsg" @mouseover="showMsg=true" @mouseout="showMsg=false">
             <new-message/>
           </div>
           <span class="icon-close" @click="logout"/>
@@ -127,15 +127,15 @@ export default {
     changeRoute() {
       this.$router.push("/" + this.nowAside.name + "/" + this.nowMenu.name);
     },
-    msgShow() {
-      this.showMsg = !this.showMsg;
-    },
-    adminShow() {
-      this.showAdmin = !this.showAdmin;
-    },
     //登出
     logout() {
-      this.$router.push("/");
+      this.$confirm("确定登出?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.$router.push("/");
+      });
       // this.$store.commit("CLEAR_USER");
     }
   }
