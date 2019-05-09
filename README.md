@@ -6,6 +6,9 @@
 
 ![image](https://github.com/xiannvjiadexiaogouzi/retail-terminal-b/blob/master/src/assets/gif/Jietu20190225212712.gif)
 
+## 技术栈
+vue + vue-router + vuex + webpack + axios + scss + localStorage
+
 ## Project setup
 ```
 npm install
