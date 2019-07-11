@@ -1,0 +1,624 @@
+@url = http://localhost:3000
+@json = Content-Type: application/json
+
+### 所有用户
+get {{url}}/merchant/users
+
+### 注册
+post {{url}}/merchant/register
+{{json}}
+
+{
+  "username": "user1",
+  "password": "123456"
+}
+
+### 登陆
+post {{url}}/merchant/login
+{{json}}
+
+{
+  "username": "13932493200",
+  "password": "000000"
+}
+
+### 获取所有登录信息
+get {{url}}/merchant/login_info
+
+### 获取用户登录信息
+post {{url}}/merchant/get_merchant_login_info_list
+{{json}}
+
+{
+  "username": "13932493200",
+  "currentPage": 1,
+  "pageSize": 5
+}
+
+### logout
+get {{url}}/logout
+
+################ 品牌 #############################
+### 所有品牌
+post {{url}}/merchant_goods_brand/query_for_page
+{{json}}
+
+{
+  "currentPage": 1,
+  "pageSize": 5
+  //"name": "Apple"
+}
+
+### 查看品牌
+post {{url}}/merchant_goods_brand/query_by_id
+{{json}}
+
+{
+    "id": 2
+}
+
+### 添加品牌
+post {{url}}/merchant_goods_brand/add
+{{json}}
+
+{
+    "name": "狗不理",
+    "firstChar": "g",
+    "isShow": true,
+    "story": "狗不理包子",
+    "sorting": 1123
+}
+
+### 修改品牌
+post {{url}}/merchant_goods_brand/update
+{{json}}
+
+{
+  "id": 2,
+  "name": "sony",
+  "firstChar": "s",
+  "isShow": false,
+  "story": "sony 大法好",
+  "sorting": 123
+}
+
+################  相册 #############################
+### 所有相册
+get {{url}}/merchant_goods_galleries/all
+
+### 相册选择表
+get {{url}}/merchant_goods_galleries/query
+
+### 查看相册
+post {{url}}/merchant_goods_galleries/query_by_id
+{{json}}
+
+{
+  "id": 1
+}
+
+### 添加相册
+post {{url}}/merchant_goods_galleries/add
+{{json}}
+
+{
+  "name": "对方是个帅哥",
+  "cover": "",
+  "sorting": 2,
+  "description": "23人"
+}
+
+### 删除分类
+post {{url}}/merchant_goods_galleries/remove
+
+
+################  图片  #############################
+
+### 所有图片
+get {{url}}/merchant_goods_galleries_detail/img
+
+### 查看相册图片
+post {{url}}/merchant_goods_galleries_detail/query_for_page
+{{json}}
+
+{
+  "currentPage": 1,
+  "pageSize": 5,
+  "galleriesId": 1
+  // "name": "Apple"
+}
+
+################ 分类 types #############################
+### 所有分类
+get {{url}}/merchantGoodsType/allTypes
+
+### 分类列表
+post {{url}}/merchantGoodsType/merchant_goods_type_list_page
+{{json}}
+
+{
+  "currentPage": 1,
+  "pageSize": 5,
+  "parentId": 0
+  // "name": "Apple"
+}
+
+### 查看分类
+post {{url}}/merchantGoodsType/merchant_goods_type_by_id
+{{json}}
+
+{
+    "id": 2
+}
+
+### 添加分类
+post {{url}}/merchantGoodsType/merchant_add_goods_type
+{{json}}
+
+{
+  "typeName": "小家电",
+  "parentId": 1,
+  "showStatus": true,
+  "goodsUnit": "",
+  "goodsSort": 3
+}
+
+### 修改分类
+post {{url}}/merchantGoodsType/merchant_add_goods_type
+{{json}}
+
+{
+  "typeName": "小家电",
+  "parentId": 1,
+  "showStatus": true,
+  "goodsUnit": "",
+  "goodsSort": 3
+}
+
+### 转移分类
+post {{url}}/merchantGoodsType/merchant_goods_type_transfer
+{{json}}
+
+{
+  "newParentId": 0,
+  "id": 1
+}
+
+### 删除分类
+post {{url}}/merchantGoodsType/merchant_goods_type_delete
+{{json}}
+
+{
+  "id": 1
+}
+
+### 所有分类选择表
+get {{url}}/merchantGoodsType/query_goods_type_tree
+
+### 一级分类选择表
+get {{url}}/merchantGoodsType/merchant_goods_type_list
+
+
+################ 类型 styles #############################
+
+
+### 所有类型
+get {{url}}/merchantGoodsStyle/allStyles
+
+### 类型列表
+post {{url}}/merchantGoodsStyle/merchant_goods_type_list_page
+{{json}}
+
+{
+  "currentPage": 1,
+  "pageSize": 5,
+  "parentId": 0
+  // "name": "Apple"
+}
+
+### 添加类型
+post {{url}}/merchantGoodsStyle/merchant_goods_type_add
+{{json}}
+
+{
+  "styleName": "桃子"
+}
+
+### 删除类型
+post {{url}}/merchantGoodsStyle/merchant_goods_type_delete
+{{json}}
+
+{
+  "id": 1
+}
+
+### 所有类型选择表
+get {{url}}/merchantGoodsStyle/query_goods_type_tree
+
+
+################ 属性 property #############################
+
+
+### 所有属性
+get {{url}}/merchantGoodsProperty/all
+
+### 属性列表
+post {{url}}/merchantGoodsProperty/merchant_goods_type_list_page
+{{json}}
+
+{
+  "currentPage": 1,
+  "pageSize": 5,
+  "parentId": 0
+  // "name": "Apple"
+}
+
+### 添加属性
+post {{url}}/merchantGoodsProperty/merchant_goods_type_add
+{{json}}
+
+{
+  "id": 0,
+  "propertyList": "50寸以下,50-60寸",
+  "propertyName": "尺寸",
+  "propertySelect": 1,
+  "styleId": 1
+}
+
+### 删除属性
+post {{url}}/merchantGoodsProperty/merchant_goods_type_delete
+{{json}}
+
+{
+  "id": 1
+}
+
+### 所有属性选择表
+get {{url}}/merchantGoodsProperty/query_goods_type_tree
+
+
+################ 参数 param #############################
+
+
+### 所有参数
+get {{url}}/merchantGoodsParam/all
+
+### 参数列表
+post {{url}}/merchantGoodsParam/merchant_goods_type_list_page
+{{json}}
+
+{
+  "currentPage": 1,
+  "pageSize": 5,
+  "parentId": 0
+  // "name": "Apple"
+}
+
+### 添加参数
+post {{url}}/merchantGoodsParam/merchant_goods_type_add
+{{json}}
+
+{
+  "id": 0,
+  "paramList": "双核,三核,四核,六核",
+  "paramName": "CPU",
+  "paramSelect": 1,
+  "styleId": 1
+}
+
+### 删除参数
+post {{url}}/merchantGoodsParam/merchant_goods_type_delete
+{{json}}
+
+{
+  "id": 1
+}
+
+### 所有参数选择表
+get {{url}}/merchantGoodsParam/query_goods_type_tree
+
+################ 商品 product #############################
+
+
+### 所有商品
+get {{url}}/merchantGoods/all
+
+################ 评论 comment #############################
+
+
+### 所有评论
+get {{url}}/merchantGoodsComment/all
+
+### 评论列表
+post {{url}}/merchantGoodsComment/merchant_goods_type_list_page
+{{json}}
+
+{
+  "currentPage": 1,
+  "pageSize": 5,
+  "parentId": 0
+  // "name": "Apple"
+}
+
+### 添加评论
+post {{url}}/merchantGoodsComment/add
+{{json}}
+
+{
+  "userName": "帅哥童",
+  "goodsName": "包子",
+  "commentLevel": 5, 
+  "commentIp": "112.50.34.40",
+  "createTime": "2019.01.05",
+  "commentContent": "默认好评"
+}
+
+### 删除评论
+post {{url}}/merchantGoodsComment/merchant_goods_type_delete
+{{json}}
+
+{
+  "id": 1
+}
+
+################ 订单 order #############################
+
+
+### 所有订单
+get {{url}}/merchant_order/all
+
+### 订单列表
+post {{url}}/merchant_order/merchant_goods_type_list_page
+{{json}}
+
+{
+  "currentPage": 1,
+  "pageSize": 5,
+  "parentId": 0
+  // "name": "Apple"
+}
+
+### 订单概览
+post {{url}}/merchant_order/getOrderAllCount
+
+### 添加订单
+post {{url}}/merchant_order/add
+{{json}}
+
+{
+  "payType": 1,
+  "paySrc": 1
+}
+
+### 删除订单
+post {{url}}/merchant_order/merchant_goods_type_delete
+{{json}}
+
+{
+  "id": 1
+}
+
+
+################ 退货 return #############################
+
+
+### 所有退货
+get {{url}}/merchant_return_goods/all
+
+### 退货列表
+post {{url}}/merchant_return_goods/merchant_goods_type_list_page
+{{json}}
+
+{
+  "currentPage": 1,
+  "pageSize": 5,
+  "parentId": 0
+  // "name": "Apple"
+}
+
+### 退货概览
+post {{url}}/merchant_return_goods/getOrderAllCount
+
+### 添加退货
+post {{url}}/merchant_return_goods/add
+{{json}}
+
+{
+  "returnReason": "质量不好"
+}
+
+### 删除退货
+post {{url}}/merchant_return_goods/merchant_goods_type_delete
+{{json}}
+
+{
+  "id": 1
+}
+
+
+################ 地点 site #############################
+
+
+### 所有site
+get {{url}}/return_send/all
+
+### site列表
+post {{url}}/return_send/merchant_goods_type_list_page
+{{json}}
+
+{
+  "currentPage": 1,
+  "pageSize": 5,
+  "parentId": 0
+  // "name": "Apple"
+}
+
+### site概览
+post {{url}}/return_send/getOrderAllCount
+
+### 添加site
+post {{url}}/return_send/add_or_update
+{{json}}
+
+{
+  "returnAddress":"",
+  "returnName":"章三",
+  "returnPhone":"13565758889",
+  "returnPname":"法国村"
+}
+
+### 删除site
+post {{url}}/return_send/merchant_goods_type_delete
+{{json}}
+
+{
+  "id": 1
+}
+
+
+################ 原因 reason #############################
+
+
+### 所有reason
+get {{url}}/return_reason/all
+
+### reason列表
+post {{url}}/return_reason/merchant_goods_type_list_page
+{{json}}
+
+{
+  "currentPage": 1,
+  "pageSize": 5,
+  "parentId": 0
+  // "name": "Apple"
+}
+
+### reason概览
+post {{url}}/return_reason/getOrderAllCount
+
+### 添加reason
+post {{url}}/return_reason/add
+{{json}}
+
+{
+  "isUse": 1,
+  "reasonType":"无理由退换",
+  "sorts": 12
+}
+
+### 删除reason
+post {{url}}/return_reason/merchant_goods_type_delete
+{{json}}
+
+{
+  "id": 1
+}
+
+################ 库存 stock #############################
+
+
+### 所有stock
+get {{url}}/merchant_goods_log/all
+
+### stock列表
+post {{url}}/merchant_goods_log/query_for_page
+{{json}}
+
+{
+  "currentPage": 1,
+  "pageSize": 5,
+  "parentId": 0
+  // "name": "Apple"
+}
+
+### 添加stock 入库
+post {{url}}/merchant_goods_log/add
+
+### 删除stock
+post {{url}}/merchant_goods_log/merchant_goods_type_delete
+{{json}}
+
+{
+  "id": 1
+}
+################ 用户 account #############################
+
+
+### 所有account
+get {{url}}/user/all
+
+### account列表
+post {{url}}/user/query_for_page
+{{json}}
+
+{
+  "currentPage": 1,
+  "pageSize": 5,
+  "parentId": 0
+  // "name": "Apple"
+}
+
+### 添加account
+post {{url}}/user/add
+
+### 随机绑定 
+get {{url}}/user/order
+
+### 删除account
+post {{url}}/user/merchant_goods_type_delete
+{{json}}
+
+{
+  "id": 1
+}
+
+################ 运营 ad #############################
+
+
+### 所有ad
+get {{url}}/merchant_ad/all
+
+### ad列表
+post {{url}}/merchant_ad/query_for_page
+{{json}}
+
+{
+  "currentPage": 1,
+  "pageSize": 5,
+  "parentId": 0
+  // "name": "Apple"
+}
+
+### 添加ad
+post {{url}}/merchant_ad/add_merchant_ad
+
+### 随机绑定 
+get {{url}}/merchant_ad/order
+
+### 删除ad
+post {{url}}/merchant_ad/merchant_goods_type_delete
+{{json}}
+
+{
+  "id": 1
+}
+
+
+################ 设置 setting #############################
+
+
+### 所有ad
+get {{url}}/merchant_pay_mode/all
+
+### ad列表
+post {{url}}/merchant_pay_mode/add
+
+
+################ 操作 log #############################
+
+
+### 所有ad
+get {{url}}/user_operation_log/all
+
+### ad列表
+post {{url}}/merchant_pay_mode/add
