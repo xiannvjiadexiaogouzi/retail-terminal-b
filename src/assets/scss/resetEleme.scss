@@ -1,3 +1,5 @@
+@import './mixin.scss';
+
 .login .el-input {
     margin: 15px 0;
 
@@ -693,4 +695,11 @@ div.add-product {
     .upload-demo {
         margin-top: 20px;
     }
+}
+
+.refresh-btn >>> .el-button:focus, 
+.refresh-btn >>> .el-button:hover {
+    color: $rule-blue !important;
+    // border-color: #c6e2ff;
+    // background-color: #ecf5ff;
 }

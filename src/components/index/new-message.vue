@@ -6,38 +6,38 @@
         <span>待付款订单</span>
         <span>
           （
-          <span class="red">10</span> ）
+          <span class="red">{{orderData.dfk}}</span> ）
         </span>
       </li>
       <li>
-        <span>待付款订单</span>
+        <span>待确认退货订单</span>
         <span>
           （
-          <span class="red">10</span> ）
+          <span class="red">{{returnData.dcl}}</span> ）
         </span>
       </li>
       <li>
-        <span>待付款订单</span>
+        <span>待发货订单</span>
         <span>
           （
-          <span class="red">10</span> ）
+          <span class="red">{{orderData.dfh}}</span> ）
         </span>
       </li>
       <li>
-        <span>待付款订单</span>
+        <span>待处理退款申请</span>
         <span>
           （
-          <span class="red">10</span> ）
+          <span class="red">{{returnData.thz}}</span> ）
         </span>
       </li>
     </ul>
     <ul>
-      <div class="msg-title">订单提示</div>
+      <div class="msg-title">订单总数</div>
       <li>
-        <span>待付款订单</span>
+        <span>已完成订单</span>
         <span>
           （
-          <span class="red">10</span> ）
+          <span class="red">{{orderData.ywc}}</span> ）
         </span>
       </li>
     </ul>
@@ -45,7 +45,53 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      orderData: {},
+      returnData: {}
+    };
+  },
+  created() {
+    this.getOrderData();
+    this.getReturnData();
+  },
+  methods: {
+    getOrderData() {
+      this.$axios({
+        method: "post",
+        url: this.$api.order_count,
+        data: {
+          merchantId: JSON.parse(localStorage.user).merchantId
+        }
+      })
+        .then(res => {
+          // console.log(res);
+          this.orderData = res.data;
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+
+    getReturnData() {
+      this.$axios({
+        method: "post",
+        url: this.$api.return_view,
+        data: {
+          merchantId: JSON.parse(localStorage.user).merchantId
+        }
+      })
+        .then(res => {
+          // console.log(res);
+          this.returnData = res.data;
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -58,8 +104,8 @@ export default {};
   padding: 0 18px;
   & > ul {
     padding: 25px 20px 20px 20px;
-    border-bottom: 1px solid rgba(210,210,210,1);
-    &:last-child{
+    border-bottom: 1px solid rgba(210, 210, 210, 1);
+    &:last-child {
       border: none;
     }
     .msg-title {
@@ -75,10 +121,10 @@ export default {};
       font-size: 16px;
       color: rgba(114, 113, 113, 1);
       line-height: 48px;
-      &>span{
+      & > span {
         display: inline-block;
-        .red{
-          color: #D23029;
+        .red {
+          color: #d23029;
         }
       }
     }

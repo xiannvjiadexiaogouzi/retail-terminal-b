@@ -36,7 +36,7 @@
           <template slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
         <el-table-column prop="paramName" label="参数名称" width/>
-        <el-table-column prop="styleName" label="商品类型" width/>
+        <el-table-column prop="style.styleName" label="商品类型" width/>
         <el-table-column prop="paramSelect" label="参数录入方式">
           <template slot-scope="scope">{{scope.row.paramSelect == 2 ? '多选参数' : '单选参数'}}</template>
         </el-table-column>
@@ -45,7 +45,7 @@
         <el-table-column prop="name" label="操作" width>
           <template slot-scope="scope">
             <span @click="addParam(scope.row.id)">编辑</span>
-            <span class="warning">删除</span>
+            <span class="warning" @click="remove([scope.row.id])">删除</span>
           </template>
         </el-table-column>
       </el-table>
@@ -96,16 +96,18 @@ export default {
     getTableData(page) {
       this.$axios({
         method: "post",
-        url: "api/merchantGoodsParam/merchant_goods_property_list_page",
+        url: this.$api.param,
         data: {
-          styleId: this.$route.params.styleId
+          styleId: this.$route.params.styleId,
+          currentPage: page || this.currentPage,
+          pageSize: this.pageSize
         }
       })
         .then(res => {
           console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           console.log(err);
@@ -130,7 +132,7 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchantGoodsParam/delete_batch",
+          url: this.$api.param_delete,
           data: ids
         })
           .then(() => {
@@ -144,14 +146,14 @@ export default {
           });
       });
     },
-    batchOperate(){
+    batchOperate() {
       let arr = [];
       this.tableSelection.forEach(item => {
         arr.push(item.id);
       });
       switch (this.nowBatchOperation) {
         case "":
-          this.msg('请选择操作', 'error');
+          this.msg("请选择操作", "error");
           break;
         case "删除":
           this.remove(arr);

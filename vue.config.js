@@ -13,8 +13,13 @@ module.exports = {
     //     }
     // }
 
-    baseUrl: './', //default ? 报错 ?
+    publicPath: './', //default ? 报错 ?
     // lintOnSave: true, //default
+    configureWebpack: config => {
+        if (process.env.NODE_ENV === 'production') {
+            config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true
+        }
+    },
     //代理服务器
     devServer: {
         // // 设置主机地址
@@ -22,18 +27,18 @@ module.exports = {
         // // 设置默认端口
         // port: 8080,
         // 设置代理 (在有后端接口的情况下)
-        proxy: {
-            'api': {
-                // 目标 API 地址
-                target: 'http://47.107.167.164:8080',
-                // 如果要代理 websockets
-                ws: true,
-                // 将主机标头的原点更改为目标URL
-                changeOrigin: true,
-                pathRewrite: {
-                    '^/api': '' //代理的路径
-                },
-            },
-        },
+        // proxy: {
+        //     'api': {
+        //         // 目标 API 地址
+        //         target: 'http://47.107.167.164:8080',
+        //         // 如果要代理 websockets
+        //         ws: true,
+        //         // 将主机标头的原点更改为目标URL
+        //         changeOrigin: true,
+        //         pathRewrite: {
+        //             '^/api': '' //代理的路径
+        //         },
+        //     },
+        // }
     }
 }

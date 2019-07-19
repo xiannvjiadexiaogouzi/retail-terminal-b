@@ -43,7 +43,7 @@
             </tr>
             <tr>
               <td>城市</td>
-              <td>{{user.remark5}}</td>
+              <td>{{user.city}}</td>
               <td>用户来源</td>
               <td>小程序</td>
             </tr>
@@ -60,7 +60,7 @@
         <el-table ref="productTable" :data="userData" tooltip-effect="dark" style="width: 100%">
           <el-table-column prop="consumption" label="消费金额" width/>
           <el-table-column prop="order_count" label="订单数量" width="150"/>
-          <el-table-column prop="collection" label="收藏商品" width/>
+          <el-table-column prop="favourite" label="收藏商品" width/>
           <el-table-column prop="evaluation" label="商品评价" width/>
           <el-table-column prop="return_record" label="退货记录" width/>
           <el-table-column prop="login_count" label="登录次数" width/>
@@ -82,8 +82,8 @@
             <template slot-scope="scope">
               <el-switch
                 v-model="scope.row.defaultState"
-                :inactive-value="0"
-                :active-value="1"
+                :inactive-value="false"
+                :active-value="true"
                 active-color="#5BC0BF"
                 disabled
               />
@@ -117,15 +117,15 @@
           style="width: 100%"
           @selection-change="handleSelectionChange"
         >
-          <el-table-column prop="id" label="订单编号" width/>
-          <el-table-column prop="creatTime" label="提交时间" width="200"/>
-          <el-table-column prop="userId" label="用户账户" width/>
-          <el-table-column prop="totalMoeny" label="订单金额" width/>
+          <el-table-column prop="code" label="订单编号" width/>
+          <el-table-column prop="createTime" label="提交时间" width="200"/>
+          <el-table-column prop="mobilePhone" label="用户账户" width/>
+          <el-table-column prop="totalMoney" label="订单金额" width/>
           <el-table-column prop="payType" label="支付方式" width>
             <template slot-scope="scope">{{payTypeTxt(scope.row.payType)}}</template>
           </el-table-column>
           <el-table-column prop="payType" label="订单来源" width>
-            <template slot-scope="scope">{{payTypeTxt(scope.row.payType)}}</template>
+            <template slot-scope="scope">{{paySrcTxt(scope.row.payType)}}</template>
           </el-table-column>
           <el-table-column prop="status" label="订单状态" width>
             <template slot-scope="scope">{{orderStatus(scope.row.status)}}</template>
@@ -135,13 +135,13 @@
               <span
                 @click="$router.push({name:'order-detail',query:{orderId:scope.row.id,mobilePhone:scope.row.mobilePhone}})"
               >查看订单</span>
-              <span v-if="scope.row.status==2">订单发货</span>
+              <!-- <span v-if="scope.row.status==2">订单发货</span>
               <span v-if="scope.row.status==0">删除订单</span>
               <span
                 v-if="scope.row.status==5||scope.row.status==6"
                 @click="deliveryInfo(scope.row.id)"
               >追踪订单</span>
-              <span v-if="scope.row.status==1">关闭订单</span>
+              <span v-if="scope.row.status==1">关闭订单</span> -->
             </template>
           </el-table-column>
         </el-table>
@@ -191,43 +191,47 @@ export default {
     getUserData() {
       this.$axios({
         method: "post",
-        url: "api/user_detail/query/" + this.$route.query.userId
+        url: this.$api.user_detail + this.$route.query.userId
       })
         .then(res => {
-          console.log(res);
-          this.userData.push(res.data.data);
-          this.user = res.data.data.user;
-          this.address = res.data.data.addressList;
+          // console.log(res);
+          this.userData.push(res.data);
+          this.user = res.data.user;
+          this.address = res.data.addressList;
         })
         .catch(err => {
-          console.log(err);
+          // console.log(err);
+          this.msg(err, 'error');
         });
     },
     //获取订单记录(后1张表)
     getTableData() {
       this.$axios({
         method: "post",
-        url: "api/merchant_order/query_for_page",
+        url: this.$api.order,
         data: {
           currentPage: this.currentPage,
           pageSize: this.pageSize,
-          userId: this.$route.query.userId,
-          merchantId: JSON.parse(localStorage.user).merchantId
+          userId: this.$route.query.userId
+          // merchantId: JSON.parse(localStorage.user).merchantId
         }
       })
         .then(res => {
           //   console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           console.log(err);
         });
     },
     //支付方式
+    paySrcTxt(type) {
+      return type == 1 ? "微信小程序":'未知';
+    },
     payTypeTxt(type) {
-      return "微信小程序";
+      return type == 1 ? "微信支付":'未知';
     },
     //订单状态
     orderStatus(status) {

@@ -5,7 +5,7 @@
       <i class="view-title-before"/>
       <span class="title">{{titleTxt}}</span>
       <div class="refresh-btn">
-        <el-button icon="el-icon-close" @click="$router.go(-1)">关闭</el-button>
+        <el-button icon="el-icon-close" @click="$router.push('pics')">关闭</el-button>
       </div>
     </div>
     <!-- 表单本体 -->
@@ -87,22 +87,22 @@ export default {
     getFormData() {
       this.$axios({
         method: "post",
-        url: "api/merchant_goods_galleries/query_by_id",
-        type: "form",
+        url: this.$api.pics_detail,
+        // type: "form",
         data: {
           id: this.$route.query.picsId
         },
-        //使用qs模块转化data为form格式提交
-        transformRequest: [
-          function(data) {
-            data = Qs.stringify(data);
-            return data;
-          }
-        ],
-        // 修改header为formdata格式
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
+        // //使用qs模块转化data为form格式提交
+        // transformRequest: [
+        //   function(data) {
+        //     data = Qs.stringify(data);
+        //     return data;
+        //   }
+        // ],
+        // // 修改header为formdata格式
+        // headers: {
+        //   "Content-Type": "application/x-www-form-urlencoded"
+        // }
       })
         .then(res => {
           // console.log(res);
@@ -127,10 +127,10 @@ export default {
           console.log(this.isAdd)
           if (this.isAdd) {
             //判断是否新增参数
-            this.submitForm("api/merchant_goods_galleries/add", this.ruleForm);
+            this.submitForm(this.$api.pics_add, this.ruleForm);
           } else {
             this.submitForm(
-              "api/merchant_goods_galleries/update",
+              this.$api.pics_update,
               this.ruleForm
             );
           }

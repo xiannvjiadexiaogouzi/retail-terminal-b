@@ -11,14 +11,18 @@
         <el-table ref="productTable" :data="table1" tooltip-effect="dark" style="width: 100%">
           <el-table-column prop="goodsPic" label="商品图片" width>
             <template slot-scope="scope">
-              <img :src="scope.row.goodsPic" alt>
+              <img :src="adjustImg(scope.row.goodsImg[0])" alt>
             </template>
           </el-table-column>
           <el-table-column prop="goodsName" label="商品名称" width/>
           <el-table-column prop="goodsPrice" label="价格/货号" width/>
-          <el-table-column prop="goodsBrand" label="属性" width/>
-          <el-table-column prop="buyNum" label="数量" width/>
-          <el-table-column prop="totalMoney" label="小计" width/>
+          <el-table-column prop="brandName" label="品牌" width/>
+          <el-table-column prop label="数量" width>
+            <template>{{tableData.buyNum}}</template>
+          </el-table-column>
+          <el-table-column prop="totalMoney" label="小计" width>
+            <template>{{tableData.returnMoney}}</template>
+          </el-table-column>
         </el-table>
       </div>
 
@@ -39,7 +43,7 @@
           </tr>
           <tr>
             <td>申请时间</td>
-            <td>{{tableData.creatTime}}</td>
+            <td>{{tableData.createTime}}</td>
           </tr>
           <tr>
             <td>用户账号</td>
@@ -172,35 +176,36 @@ export default {
       //商品数据
       this.$axios({
         method: "post",
-        url: "api/merchant_return_goods/query_By_Id",
+        url: this.$api.return_detail,
         data: {
-          id: this.$route.query.orderId,
-          merchantId: JSON.parse(localStorage.user).merchantId
+          code: this.$route.query.code
+          // merchantId: JSON.parse(localStorage.user).merchantId
         }
       })
         .then(res => {
           console.log(res);
           //服务单信息
-          this.tableData = res.data.data;
+          this.tableData = res.data;
           //退货商品
-          this.table1.push(res.data.data.merchantOrderDetail);
+          this.table1.push(res.data.goods);
         })
         .catch(err => {
-          console.log(err);
+          // console.log(err);
+          this.msg(err, "error");
         });
       //收货点选择列表
       this.$axios({
         method: "post",
-        url: "api/return_send/query_for_page",
+        url: this.$api.return_site,
         data: {
           currentPage: this.currentPage,
-          pageSize: this.pageSize,
-          merchantId: JSON.parse(localStorage.user).merchantId
+          pageSize: this.pageSize
+          // merchantId: JSON.parse(localStorage.user).merchantId
         }
       })
         .then(res => {
-          console.log(res);
-          this.returnSiteList = res.data.data.list;
+          // console.log(res);
+          this.returnSiteList = res.data.data;
         })
         .catch(err => {
           console.log(err);
@@ -211,35 +216,48 @@ export default {
       //0关闭1待付款2待发货3已发货 4已收货5已评价 6已完成 20删除
       switch (status) {
         case 1:
-          return "未处理";
+          return "待处理";
+          break;
+        case 2:
+          return "同意退货";
+          break;
+        case 3:
+          return "拒绝退货";
+          break;
+        case 4:
+          return "收到货确认退款";
+          break;
+        case 5:
+          return "收到货拒绝退款";
           break;
         default:
-          return "已处理";
+          return "已完成";
       }
     },
     //获取收货地点选中后的信息
     getSelectIdData() {
       this.$axios({
         method: "post",
-        url: "api/return_send/query_By_Id",
+        url: this.$api.return_site_detail,
         data: {
           id: this.selectId
         }
       })
         .then(res => {
-          console.log(res);
+          // console.log(res);
           this.selectSite = res.data.data;
         })
         .catch(err => {
-          console.log(err);
+          // console.log(err);
+          this.msg(err, 'error')
         });
     },
     agreeOrRejectReturn(status) {
       this.$axios({
         method: "post",
-        url: "api/merchant_return_goods/update",
+        url: this.$api.return_update,
         data: {
-          id: this.tableData.id,
+          code: this.tableData.code,
           status: status,
           returnSendId: this.selectId,
           returnMoney: this.returnMoney,
@@ -247,19 +265,14 @@ export default {
         }
       }).then(
         res => {
-          this.$message({
-            message: "提交成功",
-            type: "success",
-            showClose: true,
-            duration: 2500
-          });
+          this.msg();
           setTimeout(() => {
-            this.$router.back();
-          }, 3000);
+            this.$router.push({ name: "return" });
+          }, 2500);
         },
         err => {}
       );
-    },
+    }
   }
 };
 </script>

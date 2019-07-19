@@ -75,7 +75,7 @@
         <el-table-column prop="id" label="编号" width/>
         <el-table-column prop="goodsImg" label="商品图片" width>
           <template slot-scope="scope">
-            <img :src="scope.row.goodsImg" alt>
+            <img :src="adjustImg(scope.row.goodsImg[0])" alt>
           </template>
         </el-table-column>
         <el-table-column prop="goodsName" label="商品名称" width/>
@@ -84,7 +84,7 @@
         <el-table-column prop="goodsNo" label="货号" width/>
         <el-table-column label="操作" width>
           <template slot-scope="scope">
-            <span @click="restore(scope.row.id)">还原</span>
+            <span @click="bartchRestore([scope.row.id])">还原</span>
             <span class="warning" @click="remove([scope.row.id])">删除</span>
           </template>
         </el-table-column>
@@ -128,20 +128,20 @@ export default {
   created() {
     this.getTableData();
     //分类数据
-    this.$axios("api/merchantGoodsType/query_goods_type_tree")
+    this.$axios(this.$api.type_list)
       .then(res => {
         // console.log(res);
-        this.productTypes = res.data.data;
+        this.productTypes = res.data;
       })
       .catch(err => {
         // console.log(err);
         this.msg(err, "error");
       });
     //品牌分类
-    this.$axios("api/merchant_goods_brand/query_list")
+    this.$axios(this.$api.brand_list)
       .then(res => {
         // console.log(res);
-        this.brandList = res.data.data;
+        this.brandList = res.data;
       })
       .catch(err => {
         this.msg(err, "error");
@@ -154,7 +154,7 @@ export default {
     getTableData(page) {
       this.$axios({
         method: "post",
-        url: "api/merchantGoods/merchant_goods_recycling",
+        url: this.$api.recycle,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
@@ -165,37 +165,37 @@ export default {
       })
         .then(res => {
           // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           this.msg(err, "error");
         });
     },
     //还原(单个)
-    restore(id) {
-      this.$confirm("确定还原?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        this.$axios({
-          method: "post",
-          url: "api/merchantGoods/merchant_goods_recycling_reduction",
-          data: {
-            id: id
-          }
-        })
-          .then(res => {
-            this.msg("还原成功");
-            this.getTableData();
-          })
-          .catch(err => {
-            this.msg(err, "error");
-          });
-      });
-    },
+    // restore(id) {
+    //   this.$confirm("确定还原?", "提示", {
+    //     confirmButtonText: "确定",
+    //     cancelButtonText: "取消",
+    //     type: "warning"
+    //   }).then(() => {
+    //     this.$axios({
+    //       method: "post",
+    //       url: '',
+    //       data: {
+    //         id: id
+    //       }
+    //     })
+    //       .then(res => {
+    //         this.msg("还原成功");
+    //         this.getTableData();
+    //       })
+    //       .catch(err => {
+    //         this.msg(err, "error");
+    //       });
+    //   });
+    // },
     //还原(批量)
     bartchRestore(ids) {
       this.$confirm("确定还原?", "提示", {
@@ -205,7 +205,7 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchantGoods/merchant_goods_batch_reduction",
+          url: this.$api.reduction,
           data: ids
         })
           .then(res => {
@@ -227,7 +227,7 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchantGoods/delete_batch_recycling",
+          url: this.$api.recycle_delete,
           data: id
         })
           .then(() => {

@@ -42,8 +42,8 @@
           <template slot-scope="scope">
             <el-switch
               v-model="scope.row.showStatus"
-              :inactive-value="1"
-              :active-value="0"
+              :inactive-value="false"
+              :active-value="true"
               active-color="#5BC0BF"
               @change="handleShowStatus($event,scope.row)"
             />
@@ -60,7 +60,7 @@
             <span v-if="!isSecond" @click="toSecond(scope.row.id)">查看下级</span>
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="操作" width>
+        <el-table-column prop="" label="操作" width>
           <template slot-scope="scope">
             <span @click="$router.push({name: 'add-type',query: {id: scope.row.id}})">编辑</span>
             <span class="warning" @click="remove(scope.row.id)">删除</span>
@@ -138,10 +138,10 @@ export default {
   methods: {
     getTableData(page, id) {
       //获取typeList
-      this.$axios("api/merchantGoodsType/merchant_goods_type_list")
+      this.$axios(this.$api.type_list)
         .then(res => {
-          //console.log(res);
-          this.typeList = res.data.data;
+          console.log(res);
+          this.typeList = res.data;
           //   //   处理数据,分成parentlist和childrenlist
           //   this.tableData = this.list.filter((item)=>{
           //       return item.parentId === 0;
@@ -153,7 +153,7 @@ export default {
       // 获取表格信息
       this.$axios({
         method: "post",
-        url: "api/merchantGoodsType/merchant_goods_type_list_page",
+        url: this.$api.type,
         data: {
           parentId: id || 0,
           currentPage: page || this.currentPage,
@@ -161,10 +161,10 @@ export default {
         }
       })
         .then(res => {
-          //console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          console.log(res);
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           console.log(err);
@@ -191,7 +191,7 @@ export default {
       let show = $event ? 1 : 0;
       this.$axios({
         method: "post",
-        url: "api/merchantGoodsType/merchant_goods_type_update",
+        url: this.$api.type_update,
         data: {
           id: data.id,
           showStatus: show
@@ -219,10 +219,10 @@ export default {
     submitTrans() {
       this.$axios({
         method: "post",
-        url: "api/merchantGoodsType/merchant_goods_type_transfer",
+        url: this.$api.type_trans,
         data: {
-          originalId: this.oldType[0].id,
-          lastId: this.newTypeId
+          id: this.oldType[0].id,
+          newParentId: this.newTypeId
         }
       })
         .then(res => {
@@ -247,7 +247,7 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchantGoodsType/merchant_goods_type_delete",
+          url: this.$api.type_delete,
           data: {
             id: id
           }
@@ -259,7 +259,7 @@ export default {
           .catch(err => {
             // console.log(err);
             this.msg(err, "error");
-            this.getTableData();
+            this.getTableData(1);
           });
       });
     },

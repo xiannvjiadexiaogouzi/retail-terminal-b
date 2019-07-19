@@ -20,7 +20,7 @@
           <el-input v-model="ruleForm.propertyName" placeholder="请输入属性名称"/>
         </el-form-item>
         <el-form-item label="商品类型" prop="styleId">
-          <el-select v-model="ruleForm.styleId" placeholder="请选择商品类型">
+          <el-select v-model="ruleForm.styleId" placeholder="请选择商品类型" :disabled="!isAdd">
             <el-option
               v-for="item in productTypes"
               :key="item.styleName"
@@ -123,10 +123,10 @@ export default {
       this.getPropertyData();
     }
     //分类数据
-    this.$axios("api/merchantGoodsStyle/merchant_goods_type_list")
+    this.$axios(this.$api.style_list)
       .then(res => {
         console.log(res);
-        this.productTypes = res.data.data;
+        this.productTypes = res.data;
       })
       .catch(err => {
         console.log(err);
@@ -142,19 +142,19 @@ export default {
     getPropertyData() {
       this.$axios({
         method: "post",
-        url: "api/merchantGoodsProperty/merchant_goods_type_by_id",
+        url: this.$api.property_detail,
         data: {
           id: this.$route.query.propertyId
         }
       })
         .then(res => {
-          //   console.log(res);
+          console.log(res);
           this.ruleForm.id = this.$route.query.propertyId;
           this.ruleForm.styleId = res.data.data.styleId;
           this.ruleForm.propertyName = res.data.data.propertyName;
           this.ruleForm.propertySelect = res.data.data.propertySelect;
           this.ruleForm.propertyOrder = res.data.data.propertyOrder;
-          this.propertyList = res.data.data.propertyList.split(",");
+          this.propertyList = res.data.data.propertyList;
         })
         .catch(err => {
           console.log(err);
@@ -189,21 +189,15 @@ export default {
           this.ruleForm.propertyList = this.propertyList.join();
           if (this.isAdd) {
             //判断是否新增属性
-            this.submitForm(
-              "api/merchantGoodsProperty/merchant_goods_type_add",
-              this.ruleForm
-            );
+            this.submitForm(this.$api.property_add, this.ruleForm);
           } else {
-            this.submitForm(
-              "api/merchantGoodsProperty/merchant_goods_type_update",
-              this.ruleForm
-            );
+            this.submitForm(this.$api.property_update, this.ruleForm);
           }
           this.msg();
           this.goBack();
         } else {
           // console.log("error submit!!");
-          this.msg('error submit!!','error')
+          this.msg("error submit!!", "error");
           return false;
         }
       });

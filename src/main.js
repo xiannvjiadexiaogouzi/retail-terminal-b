@@ -5,6 +5,9 @@ import store from './store'
 import Element from 'element-ui';
 import axios from 'axios';
 
+import api from '@/util/api.js'
+Vue.prototype.$api = api;
+
 import '@/assets/css/reset.css';
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/assets/scss/index.scss';

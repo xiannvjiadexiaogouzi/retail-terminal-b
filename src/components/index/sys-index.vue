@@ -62,7 +62,7 @@
           <span @click="$router.push('/order/return')">待确认退货订单</span>
           <span>
             （
-            <span class="todo-num">{{orderData.dqrth}}</span> ）
+            <span class="todo-num">{{returnData.dcl}}</span> ）
           </span>
         </td>
       </tr>
@@ -78,14 +78,14 @@
           <span @click="$router.push('/order/refund')">待处理退款申请</span>
           <span>
             （
-            <span class="todo-num">{{orderData.dcltk}}</span> ）
+            <span class="todo-num">{{returnData.thz}}</span> ）
           </span>
         </td>
         <td>
           <span @click="$router.push('/order/order-list')">已发货订单</span>
           <span>
             （
-            <span class="todo-num">{{orderData.dsh}}</span> ）
+            <span class="todo-num">{{orderData.yfh}}</span> ）
           </span>
         </td>
       </tr>
@@ -204,17 +204,19 @@ export default {
         {}
       ],
       orderData: {},
+      returnData: {},
       productData: {
-        notPull: "0",
-        put: "0",
-        count: "0",
-        all: "0"
+        // notPull: "0",
+        // put: "0",
+        // count: "0",
+        // all: "0"
       },
       userData: {}
     };
   },
   created() {
     this.getOrderData();
+    this.getReturnData();
     this.getProductData();
     this.getUserData();
   },
@@ -223,14 +225,34 @@ export default {
     getOrderData() {
       this.$axios({
         method: "post",
-        url: "api/merchant_order/getOrderAllCount",
+        url: this.$api.order_count,
+        // url: 'https://bird.ioliu.cn/v1?url=http://47.107.167.164:8080/merchant_order/getOrderAllCount',
+        // url: "api/merchant_order/getOrderAllCount",
         data: {
           merchantId: JSON.parse(localStorage.user).merchantId
-        }
+        },
+        // type:'json',
+        // headers: { "Content-Type": "application/json" }
       })
         .then(res => {
-          // console.log(res);
-          this.orderData = res.data.data;
+          console.log(res);
+          this.orderData = res.data;
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getReturnData() {
+      this.$axios({
+        method: "post",
+        url: this.$api.return_view,
+        data: {
+          merchantId: JSON.parse(localStorage.user).merchantId
+        },
+      })
+        .then(res => {
+          console.log(res);
+          this.returnData = res.data;
         })
         .catch(err => {
           console.log(err);
@@ -238,11 +260,11 @@ export default {
     },
     //商品总览
     getProductData() {
-      this.$axios("api/merchantGoods/goodsCountStatistics")
+      this.$axios(this.$api.good_count_statistic)
         .then(res => {
-          // console.log(res);
-          if (res.data.data) {
-            this.productData = res.data.data;
+          console.log(res);
+          if (res.data) {
+            this.productData = res.data;
           }
         })
         .catch(err => {
@@ -251,10 +273,10 @@ export default {
     },
     //用户总览
     getUserData() {
-      this.$axios("api/merchant/merchant_index")
+      this.$axios(this.$api.user_index)
         .then(res => {
-          // console.log(res);
-          this.userData = res.data.data;
+          console.log(res);
+          this.userData = res.data;
         })
         .catch(err => {
           console.log(err);

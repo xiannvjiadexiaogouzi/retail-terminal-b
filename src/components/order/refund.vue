@@ -16,14 +16,14 @@
           )
         </p>
       </div>
-      <div class="search-filter" :class="status === 6 ?  'active' : ''" @click="handleStatus(6)">
+      <div class="search-filter" :class="status === 4 ?  'active' : ''" @click="handleStatus(4)">
         <p>
-          已处理 (
-          <span>{{orderCount.ycl}}</span>
+          已退款 (
+          <span>{{orderCount.ytk}}</span>
           )
         </p>
       </div>
-      <div class="search-filter" :class="status === 3 ?  'active' : ''" @click="handleStatus(3)">
+      <div class="search-filter" :class="status === 5 ?  'active' : ''" @click="handleStatus(5)">
         <p>
           已拒绝 (
           <span>{{orderCount.yjj}}</span>
@@ -49,18 +49,21 @@
         </div>
       </div>
       <div class="search-bottom" v-if="showSearch">
-        <div class="search-bar">订单编号：
+        <div class="search-bar">
+          订单编号：
           <el-input v-model="searchcode" placeholder="订单编号" clearable @change="getTableData(1)"/>
         </div>
-        <div class="search-bar">用户账户：
-          <el-input v-model="receiver" placeholder="收货人姓名" clearable @change="getTableData(1)"/>
+        <div class="search-bar">
+          用户账户：
+          <el-input v-model="mobilePhone" placeholder="收货人姓名" clearable @change="getTableData(1)"/>
         </div>
-        <div class="search-bar">申请时间：
+        <div class="search-bar">
+          申请时间：
           <el-date-picker
             v-model="date"
             type="date"
             format="yyyy-MM-dd"
-            value-format="yyyy-MM-dd hh:mm:ss"
+            value-format="yyyy-M-d"
             @change="getTableData()"
           />
         </div>
@@ -96,7 +99,7 @@
       >
         <el-table-column type="selection" width="56"/>
         <el-table-column prop="code" label="订单编号" width="220"/>
-        <el-table-column prop="creatTime" label="申请时间" width="120"/>
+        <el-table-column prop="createTime" label="申请时间" width="120"/>
         <el-table-column prop="mobilePhone" label="用户账户" width/>
         <el-table-column prop="applicationReturnMoney" label="退款金额" width/>
         <el-table-column prop="contact" label="联系人" width/>
@@ -106,9 +109,9 @@
         <el-table-column label="订单操作" width>
           <template slot-scope="scope">
             <span
-              @click="$router.push({name:'refund-detail',query:{orderId:scope.row.id,mobilePhone:scope.row.mobilePhone}})"
+              @click="$router.push({name:'refund-detail',query:{orderId:scope.row.code,mobilePhone:scope.row.mobilePhone}})"
             >查看详情</span>
-            <span v-if="scope.row.status==0">删除订单</span>
+            <span v-if="scope.row.status==0" @click="remove([scope.row.code])">删除订单</span>
           </template>
         </el-table-column>
       </el-table>
@@ -164,7 +167,7 @@ export default {
       status: "",
       statusList: [-1, 2, 6, 3],
       searchcode: null,
-      receiver: null,
+      mobilePhone: null,
       date: "",
       orderCount: {
         all: "",
@@ -180,15 +183,15 @@ export default {
   },
   created() {
     this.getTableData(1);
-    //分类数据
-    this.$axios("api/merchantGoodsType/query_goods_type_tree")
-      .then(res => {
-        // console.log(res);
-        this.productTypes = res.data.data;
-      })
-      .catch(err => {
-        this.msg(err, "error");
-      });
+    // //分类数据
+    // this.$axios("api/merchantGoodsType/query_goods_type_tree")
+    //   .then(res => {
+    //     // console.log(res);
+    //     this.productTypes = res.data.data;
+    //   })
+    //   .catch(err => {
+    //     this.msg(err, "error");
+    //   });
   },
   computed: {},
   methods: {
@@ -209,7 +212,7 @@ export default {
     },
     //订单状态
     returnStatus(status) {
-      //""全部1待处理2同意退货3拒绝 4收到确认退款5收到拒绝退款 6已完成
+      //""全部1待处理2同意退货3拒绝 4收到确认退款5收到拒绝退款 0已完成
       switch (status) {
         case 2:
           return "待处理";
@@ -221,57 +224,63 @@ export default {
     //刷新页面，重新获取数据
     getTableData(page) {
       //获取status数量
-      let promiseAll = this.statusList.map(val =>
-        this.$axios({
-          method: "post",
-          url: "api/merchant_return_goods/getCountByStatus",
-          data: {
-            merchantId: JSON.parse(localStorage.user).merchantId,
-            status: val === -1 ? "" : val
-          }
-        })
-      );
-      let that = this;
-      this.$axios.all(promiseAll).then(function(resArr) {
-        //   console.log(resArr)
-        resArr.forEach(function(res, i) {
-          let statusName = "";
-          switch (i) {
-            case 0:
-              statusName = "all";
-              break;
-            case 1:
-              statusName = "dcl";
-              break;
-            case 2:
-              statusName = "ycl";
-              break;
-            case 3:
-              statusName = "yjj";
-              break;
-          }
-          that.orderCount[statusName] = res.data.data;
-        });
+      // let promiseAll = this.statusList.map(val =>
+      this.$axios({
+        method: "post",
+        url: this.$api.return_view
+        // data: {
+        //   // merchantId: JSON.parse(localStorage.user).merchantId,
+        //   status: val === -1 ? "" : val
+        // }
+      }).then(res => {
+        // console.log(res);
+        this.orderCount = res.data;
+        this.orderCount.dcl = res.data.thz;
+        this.orderCount.ycl = res.data.ytk;
+        this.orderCount.yjj = res.data.btk;
       });
+      // );
+      // let that = this;
+      // this.$axios.all(promiseAll).then(function(resArr) {
+      //   //   console.log(resArr)
+      //   resArr.forEach(function(res, i) {
+      //     let statusName = "";
+      //     switch (i) {
+      //       case 0:
+      //         statusName = "all";
+      //         break;
+      //       case 1:
+      //         statusName = "dcl";
+      //         break;
+      //       case 2:
+      //         statusName = "ycl";
+      //         break;
+      //       case 3:
+      //         statusName = "yjj";
+      //         break;
+      //     }
+      //     that.orderCount[statusName] = res.data.data;
+      //   });
+      // });
       //表格数据
       this.$axios({
         method: "post",
-        url: "api/merchant_return_goods/query_for_page",
+        url: this.$api.return,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
-          merchantId: JSON.parse(localStorage.user).merchantId,
+          // merchantId: JSON.parse(localStorage.user).merchantId,
           status: this.status,
-          phone: this.receiver,
+          mobilePhone: this.mobilePhone,
           code: this.searchcode,
-          creatTime: this.date
+          createTime: this.date
         }
       })
         .then(res => {
           // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           this.msg(err, "error");
@@ -287,8 +296,8 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchant_return_goods/delete",
-          data: { ids: ids }
+          url: this.$api.return_delete,
+          data: ids
         })
           .then(() => {
             this.msg("删除成功");

@@ -73,15 +73,15 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column prop="id" label="用户ID" width/>
-        <el-table-column prop="mobilePhone" label="手机号" width/>
-        <el-table-column prop="realName" label="用户昵称" width/>
-        <el-table-column prop="createTime" label="创建时间" width/>
-        <el-table-column prop="userStatus" label="是否启用" width="160">
+        <el-table-column prop="user.mobilePhone" label="手机号" width/>
+        <el-table-column prop="user.realName" label="用户昵称" width/>
+        <el-table-column prop="user.createTime" label="创建时间" width/>
+        <el-table-column prop="user.userStatus" label="是否启用" width="160">
           <template slot-scope="scope">
             <el-switch
-              v-model="scope.row.userStatus"
-              :inactive-value="0"
-              :active-value="1"
+              v-model="scope.row.user.userStatus"
+              :inactive-value="false"
+              :active-value="true"
               active-color="#5BC0BF"
               @change="handleShowStatus($event,scope.row)"
             />
@@ -148,8 +148,8 @@ export default {
     getTableData(page) {
       this.$axios({
         method: "post",
-        url: "api/user/get_user_list",
-        type: "form",
+        url: this.$api.user,
+        // type: "form",
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
@@ -158,23 +158,23 @@ export default {
           beginTime: this.beginTime,
           endTime: this.endTime
         },
-        //使用qs模块转化data为form格式提交
-        transformRequest: [
-          function(data) {
-            data = Qs.stringify(data);
-            return data;
-          }
-        ],
-        // 修改header为formdata格式
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
+        // //使用qs模块转化data为form格式提交
+        // transformRequest: [
+        //   function(data) {
+        //     data = Qs.stringify(data);
+        //     return data;
+        //   }
+        // ],
+        // // 修改header为formdata格式
+        // headers: {
+        //   "Content-Type": "application/x-www-form-urlencoded"
+        // }
       })
         .then(res => {
-          // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          console.log(res);
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           this.msg(err, "error");
@@ -182,26 +182,25 @@ export default {
     },
     //是否显示
     handleShowStatus($event, data) {
-      let show = $event ? 1 : 0;
       this.$axios({
         method: "post",
-        url: "api/user/change_user_status",
+        url: this.$api.user_status,
         data: {
           userId: data.id,
-          userStatus: show
+          userStatus: $event
         },
-        type: "form",
-        //使用qs模块转化data为form格式提交
-        transformRequest: [
-          function(data) {
-            data = Qs.stringify(data);
-            return data;
-          }
-        ],
-        // 修改header为formdata格式
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
+        // type: "form",
+        // //使用qs模块转化data为form格式提交
+        // transformRequest: [
+        //   function(data) {
+        //     data = Qs.stringify(data);
+        //     return data;
+        //   }
+        // ],
+        // // 修改header为formdata格式
+        // headers: {
+        //   "Content-Type": "application/x-www-form-urlencoded"
+        // }
       })
         .then(res => {
           //   console.log(res);

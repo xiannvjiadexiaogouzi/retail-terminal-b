@@ -5,7 +5,7 @@
       <i class="view-title-before"/>
       <span class="title">图片列表</span>
       <div class="refresh-btn">
-        <el-button icon="el-icon-close" @click="$router.go(-1)">关闭</el-button>
+        <el-button icon="el-icon-close" @click="$router.push('pics')">关闭</el-button>
       </div>
     </div>
     <div class="main-wrapper">
@@ -25,12 +25,12 @@
             ref="productTable"
             @change="handleSelectionChange"
           >
-            <div v-for="item in tableData" :key="item.id" class="check-item">
-              <img :src="item.imgUrl" alt>
-              <el-checkbox :label="item.id"/>
+            <div v-for="item in tableData" :key="item._id" class="check-item">
+              <img :src="picUrl(item)" alt>
+              <el-checkbox :label="item._id"/>
               <div class="item-operation">
-                <span @click="transPics(item.id)">转移相册</span>
-                <span @click="remove([item.id])">删除图片</span>
+                <span @click="transPics(item._id)">转移相册</span>
+                <span @click="remove([item._id])">删除图片</span>
               </div>
             </div>
           </el-checkbox-group>
@@ -80,10 +80,10 @@
             </el-select>
           </el-form-item>
           <el-form-item label="选择图片" prop="logo">
-            <div class="upload-pics-wrapper" v-if="ruleForm.imgUrl.length">
-              <div class="pic-wrapper" v-for="(img,index) in ruleForm.imgUrl" :key="img">
-                <img :src="img" alt>
-                <i class="el-icon-circle-close-outline" @click="ruleForm.imgUrl.splice(index,1)"/>
+            <div class="upload-pics-wrapper" v-if="ruleForm.ids.length">
+              <div class="pic-wrapper" v-for="(img,index) in upImgs" :key="index">
+                <img :src="img.imgUrl" alt>
+                <i class="el-icon-circle-close-outline" @click="ruleForm.ids.splice(index,1)"/>
               </div>
             </div>
             <el-upload
@@ -150,6 +150,7 @@ export default {
       dialogVisible: false, //上传
       dialogVisible1: false, //转移
       goodsGalleriesList: [],
+      upImgs: [],
       ruleForm1: {
         //转移
         changeToGalleries: "",
@@ -159,13 +160,13 @@ export default {
       ruleForm: {
         //上传照片
         goodsGalleriesId: "",
-        imgUrl: []
+        ids: []
       },
       rules: {
         goodsGalleriesId: [
           { required: true, message: "请选择相册", trigger: "change" }
         ],
-        imgUrl: [{ required: true, message: "请上传t图片", trigger: "change" }]
+        ids: [{ required: true, message: "请上传t图片", trigger: "change" }]
       },
       rules1: {
         goodsGalleriesId: [
@@ -180,10 +181,10 @@ export default {
     this.ruleForm1.subGalleries = this.$route.query.picsId;
     this.ruleForm1.changeToGalleries = this.ruleForm1.subGalleries;
     //获取goodsGalleriesList
-    this.$axios("api/merchant_goods_galleries/query")
+    this.$axios(this.$api.pics_list)
       .then(res => {
         console.log(res);
-        this.goodsGalleriesList = res.data.data.list;
+        this.goodsGalleriesList = res.data;
       })
       .catch(err => {
         // console.log(err);
@@ -196,18 +197,18 @@ export default {
     getTableData(page) {
       this.$axios({
         method: "post",
-        url: "api/merchant_goods_galleries_detail/query_for_page",
+        url: this.$api.pics_img,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
-          galleriesId: this.$route.query.picsId
+          picsId: this.$route.query.picsId
         }
       })
         .then(res => {
-          // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          console.log(res);
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           // console.log(err);
@@ -217,13 +218,14 @@ export default {
     //el-upload
     // 上传图片 logo
     uploadFile(content) {
-      if (this.ruleForm.imgUrl.length >= 5) {
+      if (this.ruleForm.ids.length >= 5) {
         this.msg("最多上传5张图片！", "error");
         return;
       }
       this.uploadImg(content.file).then(res => {
-        // console.log(res);
-        this.ruleForm.imgUrl.push(res.imgUrl);
+        console.log(res);
+        this.upImgs.push(res);
+        this.ruleForm.ids.push(res.id);
       });
     },
     //提交表单 上传照片
@@ -233,7 +235,7 @@ export default {
         if (valid) {
           // if (this.isAdd) {
           this.submitForm(
-            "api/merchant_goods_galleries_detail/add_batch",
+            this.$api.pics_img_add,
             this.ruleForm
           );
           // }
@@ -254,7 +256,7 @@ export default {
           if (this.isAdd) {
             //判断是否新增参数
             this.submitForm(
-              "api/merchant_goods_galleries_detail/change_galleries_batch",
+              this.$api.pics_trans,
               this.ruleForm1
             );
           }
@@ -280,7 +282,7 @@ export default {
     checkAllChange($event) {
       let arr = [];
       this.tableData.forEach(item => {
-        arr.push(item.id);
+        arr.push(item._id);
       });
       this.tableSelection = $event ? arr : [];
       this.isIndeterminate = false;
@@ -294,7 +296,7 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchant_goods_galleries_detail/delete_batch",
+          url: this.$api.pics_img_delete,
           data: ids
         })
           .then(() => {
@@ -325,6 +327,13 @@ export default {
           this.ruleForm1.ids = this.tableSelection;
           break;
       }
+    },
+    // 图片url
+    picUrl(item) {
+      console.log(item)
+      let api = item.imgUrl;
+      if (process.env.NODE_ENV === "development") api += "/api";
+      return api + item.path + item.image;
     }
   }
 };

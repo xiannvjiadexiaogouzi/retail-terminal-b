@@ -18,7 +18,7 @@
           </tr>
           <tr>
             <td>申请时间</td>
-            <td>{{tableData.creatTime}}</td>
+            <td>{{tableData.createTime}}</td>
           </tr>
           <tr>
             <td>用户账号</td>
@@ -101,19 +101,20 @@ export default {
       //商品数据
       this.$axios({
         method: "post",
-        url: "api/merchant_return_goods/query_By_Id",
+        url: this.$api.return_detail,
         data: {
-          id: this.$route.query.orderId,
-          merchantId: JSON.parse(localStorage.user).merchantId
+          code: this.$route.query.orderId,
+          // merchantId: JSON.parse(localStorage.user).merchantId
         }
       })
         .then(res => {
           console.log(res);
           //服务单信息
-          this.tableData = res.data.data;
+          this.tableData = res.data;
         })
         .catch(err => {
-          console.log(err);
+          // console.log(err);
+          this.msg(err,'error');
         });
     },
     //订单状态
@@ -131,20 +132,15 @@ export default {
     agreeOrRejectReturn(status) {
       this.$axios({
         method: "post",
-        url: "api/merchant_return_goods/update",
+        url: this.$api.return_update,
         data: {
-          id: this.tableData.id,
+          code: this.tableData.code,
           status: status,
           resolveRemark: this.resolveRemark
         }
       }).then(
         res => {
-          this.$message({
-            message: "提交成功",
-            type: "success",
-            showClose: true,
-            duration: 2500
-          });
+          this.msg();
           setTimeout(() => {
             this.$router.back();
           }, 3000);

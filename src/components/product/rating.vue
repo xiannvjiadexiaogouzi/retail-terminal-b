@@ -77,12 +77,12 @@
         <el-table-column prop="createTime" label="评论时间" width>
           <template slot-scope="scope">{{scope.row.createTime}}</template>
         </el-table-column>
-        <el-table-column prop="name" label="是否显示" width>
+        <el-table-column prop="status" label="是否显示" width>
           <template slot-scope="scope">
             <el-switch
               v-model="scope.row.status"
-              :active-value="0"
-              :inactive-value="2"
+              :active-value="true"
+              :inactive-value="false"
               active-color="#5BC0BF"
               @change="handleStatus(scope.row.id, $event)"
             />
@@ -139,22 +139,13 @@ export default {
   created() {
     //评论数据
     this.getTableData(1);
-    //分类数据
-    this.$axios("api/merchantGoodsType/query_goods_type_tree")
-      .then(res => {
-        // console.log(res);
-        this.productTypes = res.data.data;
-      })
-      .catch(err => {
-        console.log(err);
-      });
   },
   methods: {
     //刷新页面，重新获取数据
     getTableData(page) {
       this.$axios({
         method: "post",
-        url: "api/merchantGoodsComment/merchant_goods_type_list_page",
+        url: this.$api.comment,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
@@ -164,9 +155,9 @@ export default {
       })
         .then(res => {
           // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           this.msg(err, "error");
@@ -176,14 +167,14 @@ export default {
     handleStatus(id, $event) {
       this.$axios({
         method: "post",
-        url: "api/merchantGoodsComment/delete_not_show",
+        url: this.$api.comment_show,
         data: {
           id: id,
           status: $event
         }
       })
         .then(res => {
-          this.msg(res);
+          this.msg();
         })
         .catch(err => {
           this.msg(err, "error");
@@ -207,7 +198,7 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchantGoodsComment/delete_batch",
+          url: this.$api.comment_delete,
           data: ids
         })
           .then(() => {

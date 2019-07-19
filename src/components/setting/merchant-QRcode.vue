@@ -38,6 +38,7 @@ export default {
     return {
       fileList: [],
       ruleForm: {
+        userId: JSON.parse(localStorage.user).userId || localStorage.userId,
         remark2: ""
       },
       rules: {
@@ -54,7 +55,7 @@ export default {
     getFormData() {
       this.$axios({
         method: "post",
-        url: "api/merchant_pay_mode/query",
+        url: this.$api.pay,
         data: {
           merchantId: JSON.parse(localStorage.user).merchantId
         }
@@ -79,7 +80,7 @@ export default {
       this.$refs[formName].validate(valid => {
         //先检验表单
         if (valid) {
-          this.submitForm("api/merchant_pay_mode/add_qrCode", this.ruleForm);
+          this.submitForm(this.$api.pay_update, this.ruleForm);
           this.msg("保存成功");
           this.getFormData();
         } else {

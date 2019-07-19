@@ -57,7 +57,7 @@ export default {
       fileList: [],
       ruleForm: {
         id: "",
-        merchantId: "",
+        // merchantId: "",
         returnAddress: "",
         returnName: "",
         returnPhone: "",
@@ -98,13 +98,13 @@ export default {
     getFormData() {
       this.$axios({
         method: "post",
-        url: "api/return_send/query_By_Id",
+        url: this.$api.return_site_detail,
         data: {
           id: this.$route.query.siteId
         }
       })
         .then(res => {
-          // console.log(res);
+          console.log(res);
           this.ruleForm = res.data.data;
         })
         .catch(err => {
@@ -117,16 +117,11 @@ export default {
       this.$refs[formName].validate(valid => {
         //先检验表单
         if (valid) {
-          this.submitForm("api/return_send/add_or_update", this.ruleForm);
-          this.$message({
-            message: "提交成功",
-            type: "success",
-            showClose: true,
-            duration: 2500
-          });
+          this.submitForm(this.$api.return_site_add, this.ruleForm);
+          this.msg();
           setTimeout(() => {
             this.$router.back();
-          }, 3000);
+          }, 2500);
         } else {
           this.msg("error submit!!", "error");
           return false;

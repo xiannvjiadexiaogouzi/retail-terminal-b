@@ -61,8 +61,8 @@
           <template slot-scope="scope">
             <el-switch
               v-model="scope.row.isShow"
-              :inactive-value="0"
-              :active-value="1"
+              :inactive-value="false"
+              :active-value="true"
               active-color="#5BC0BF"
               @change="handleShowStatus($event,scope.row)"
             />
@@ -127,7 +127,7 @@ export default {
     getTableData(page) {
       this.$axios({
         method: "post",
-        url: "api/merchant_goods_brand/query_for_page",
+        url: this.$api.brand,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
@@ -136,9 +136,9 @@ export default {
       })
         .then(res => {
           console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           console.log(err);

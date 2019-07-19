@@ -41,8 +41,8 @@
           <template slot-scope="scope">
             <el-switch
               v-model="scope.row.online"
-              inactive-value="0"
-              active-value="1"
+              :inactive-value="false"
+              :active-value="true"
               active-color="#5BC0BF"
               @change="handleShowStatus($event,scope.row)"
             />
@@ -53,8 +53,8 @@
         <el-table-column prop="name" label="操作" width="230">
           <template slot-scope="scope">
             <span @click="$router.push({name: 'add-ad',query:{adId:scope.row.id}})">编辑</span>
-            <span @click="top(scope.row)">{{scope.row.topState == 0 ? '置顶' : '取消置顶'}}</span>
-            <span class="warning" @click="remove(scope.row.id)">删除</span>
+            <span @click="top(scope.row)">{{scope.row.topState == false ? '置顶' : '取消置顶'}}</span>
+            <span class="warning" @click="remove([scope.row.id])">删除</span>
           </template>
         </el-table-column>
       </el-table>
@@ -95,17 +95,17 @@ export default {
       // 获取表格信息
       this.$axios({
         method: "post",
-        url: "api/merchant_ad/get_merchant_ad_list",
+        url: this.$api.ad,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize
         }
       })
         .then(res => {
-          // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          console.log(res);
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           this.msg(err, "error");
@@ -123,7 +123,7 @@ export default {
       // let show = $event ? 1 : 0;
       this.$axios({
         method: "post",
-        url: "api/merchant_ad/change_merchant_ad",
+        url: this.$api.ad_update,
         data: {
           id: data.id,
           online: $event
@@ -138,17 +138,17 @@ export default {
     },
     //置顶
     top(data) {
-      let top = data.topState == 0 ? 1 : 0;
+      let top = data.topState == false ? true : false;
       this.$axios({
         method: "post",
-        url: "api/merchant_ad/change_merchant_ad",
+        url: this.$api.ad_update,
         data: {
           id: data.id,
           topState: top
         }
       })
         .then(res => {
-          this.msg("提交成功");
+          this.msg("置顶成功");
           this.getTableData();
         })
         .catch(err => {
@@ -164,8 +164,8 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchant_ad/delete_merchant_ad",
-          data: { remark: ids }
+          url: this.$api.ad_delete,
+          data: ids
         })
           .then(() => {
             this.msg("删除成功");

@@ -34,7 +34,7 @@
         <el-table-column type="selection" width="56"/>
         <el-table-column prop="id" label="编号" width/>
         <el-table-column prop="propertyName" label="属性名称" width/>
-        <el-table-column prop="styleName" label="商品类型" width/>
+        <el-table-column prop="style.styleName" label="商品类型" width/>
         <el-table-column prop="propertySelect" label="属性是否可选">
           <template slot-scope="scope">{{scope.row.paramSelect == 2 ? '多选参数' : '单选参数'}}</template>
         </el-table-column>
@@ -94,16 +94,18 @@ export default {
     getTableData(page) {
       this.$axios({
         method: "post",
-        url: "api/merchantGoodsProperty/merchant_goods_property_list_page",
+        url: this.$api.property,
         data: {
-          styleId: this.$route.params.styleId
+          styleId: this.$route.params.styleId,
+          currentPage: page || this.currentPage,
+          pageSize: this.pageSize
         }
       })
         .then(res => {
           console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           console.log(err);
@@ -142,14 +144,14 @@ export default {
           });
       });
     },
-    batchOperate(){
+    batchOperate() {
       let arr = [];
       this.tableSelection.forEach(item => {
         arr.push(item.id);
       });
       switch (this.nowBatchOperation) {
         case "":
-          this.msg('请选择操作', 'error');
+          this.msg("请选择操作", "error");
           break;
         case "删除":
           this.remove(arr);

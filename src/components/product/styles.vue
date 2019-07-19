@@ -34,8 +34,8 @@
           <template prop="id" slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
         <el-table-column prop="styleName" label="类型名称" width></el-table-column>
-        <el-table-column prop="propertyNum" label="属性数量" width></el-table-column>
-        <el-table-column prop="paramNum" label="参数数量"></el-table-column>
+        <el-table-column prop="property.length" label="属性数量" width></el-table-column>
+        <el-table-column prop="param.length" label="参数数量"></el-table-column>
         <el-table-column label="设置" width>
           <template slot-scope="scope">
             <span @click="showProperty(scope.row.id)">属性列表</span>
@@ -62,6 +62,7 @@
         </div>
       </footer>
     </div>
+    
     <!-- 编辑 -->
     <el-dialog title="编辑类型" :visible.sync="dialogVisible" width="30%">
       <el-form
@@ -115,7 +116,7 @@ export default {
     getTableData(page) {
       this.$axios({
         method: "post",
-        url: "api//merchantGoodsStyle/merchant_goods_style_list_page",
+        url: this.$api.style,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize
@@ -123,9 +124,9 @@ export default {
       })
         .then(res => {
           console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           console.log(err);
@@ -148,12 +149,12 @@ export default {
           if (this.isAdd) {
             //判断是否新增
             this.submitForm(
-              "api/merchantGoodsStyle/merchant_goods_type_add",
+              this.$api.style_add,
               this.ruleForm
             );
           } else {
             this.submitForm(
-              "api/merchantGoodsStyle/merchant_goods_type_update",
+              this.$api.style_update,
               this.ruleForm
             );
           }
@@ -172,7 +173,7 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchantGoodsStyle/merchant_goods_type_delete",
+          url: this.$api.style_delete,
           data: {
             id: id
           }

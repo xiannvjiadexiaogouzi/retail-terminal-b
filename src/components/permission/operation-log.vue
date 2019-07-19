@@ -131,19 +131,19 @@ export default {
     getTableData(page) {
       this.$axios({
         method: "post",
-        url: "api/user_operation_log/query_user_operation_log",
+        url: this.$api.operate,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
-          merchantId: JSON.parse(localStorage.user).merchantId,
+          userId: JSON.parse(localStorage.user).userId,
           operationDate: this.operationDate
         }
       })
         .then(res => {
-          // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          console.log(res);
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           thie.msg(err, "error");

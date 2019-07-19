@@ -20,7 +20,7 @@
           <el-input v-model="ruleForm.paramName" placeholder="请输入参数名称"/>
         </el-form-item>
         <el-form-item label="商品类型" prop="styleId">
-          <el-select v-model="ruleForm.styleId" placeholder="请选择商品类型">
+          <el-select v-model="ruleForm.styleId" placeholder="请选择商品类型" :disabled="!isAdd">
             <el-option
               v-for="item in productTypes"
               :key="item.styleName"
@@ -120,10 +120,10 @@ export default {
       this.getparamData();
     }
     //分类数据
-    this.$axios("api/merchantGoodsStyle/merchant_goods_type_list")
+    this.$axios(this.$api.style_list)
       .then(res => {
         // console.log(res);
-        this.productTypes = res.data.data;
+        this.productTypes = res.data;
       })
       .catch(err => {
         this.msg(err, "error");
@@ -139,7 +139,7 @@ export default {
     getparamData() {
       this.$axios({
         method: "post",
-        url: "api/merchantGoodsParam/merchant_goods_type_by_id",
+        url: this.$api.param_detail,
         data: {
           id: this.$route.query.paramId
         }
@@ -151,7 +151,7 @@ export default {
           this.ruleForm.paramName = res.data.data.paramName;
           this.ruleForm.paramSelect = res.data.data.paramSelect;
           this.ruleForm.paramSort = res.data.data.paramSort;
-          this.paramList = res.data.data.paramList.split(",");
+          this.paramList = res.data.data.paramList;
         })
         .catch(err => {
           console.log(err);
@@ -187,12 +187,12 @@ export default {
           if (this.isAdd) {
             //判断是否新增参数
             this.submitForm(
-              "api/merchantGoodsParam/merchant_goods_type_add",
+              this.$api.param_add,
               this.ruleForm
             );
           } else {
             this.submitForm(
-              "api/merchantGoodsParam/merchant_goods_type_update",
+              this.$api.param_update,
               this.ruleForm
             );
           }

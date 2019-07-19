@@ -55,8 +55,8 @@
         </el-form-item>
         <el-form-item label="是否显示" prop="isShow">
           <el-radio-group v-model="ruleForm.isShow">
-            <el-radio :label="1">显示</el-radio>
-            <el-radio :label="0">不显示</el-radio>
+            <el-radio :label="true">显示</el-radio>
+            <el-radio :label="false">不显示</el-radio>
             <p>当品牌下还没有商品的时候，分类页的品牌区将不会显示该品牌</p>
           </el-radio-group>
         </el-form-item>
@@ -122,22 +122,22 @@ export default {
     getFormData() {
       this.$axios({
         method: "post",
-        url: "api/merchant_goods_brand/query_by_id",
-        type: "form",
+        url: this.$api.brand_detail,
+        // type: "form",
         data: {
           id: this.$route.query.brandId
         },
-        //使用qs模块转化data为form格式提交
-        transformRequest: [
-          function(data) {
-            data = Qs.stringify(data);
-            return data;
-          }
-        ],
-        // 修改header为formdata格式
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
+        // //使用qs模块转化data为form格式提交
+        // transformRequest: [
+        //   function(data) {
+        //     data = Qs.stringify(data);
+        //     return data;
+        //   }
+        // ],
+        // // 修改header为formdata格式
+        // headers: {
+        //   "Content-Type": "application/x-www-form-urlencoded"
+        // }
       })
         .then(res => {
           console.log(res);

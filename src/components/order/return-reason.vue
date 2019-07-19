@@ -30,18 +30,18 @@
         <el-table-column type="selection" width="56"/>
         <el-table-column prop="reasonType" label="原因类型" width/>
         <el-table-column prop="sorts" label="排序" width/>
-        <el-table-column prop="showStatus" label="是否启用" width>
+        <el-table-column prop="isUse" label="是否启用" width>
           <template slot-scope="scope">
             <el-switch
               v-model="scope.row.isUse"
-              :inactive-value="0"
-              :active-value="1"
+              :inactive-value="false"
+              :active-value="true"
               active-color="#5BC0BF"
               @change="handleShowStatus($event,scope.row)"
             />
           </template>
         </el-table-column>
-        <el-table-column prop="creatTime" label="添加时间"/>
+        <el-table-column prop="createTime" label="添加时间"/>
         <el-table-column prop="oeration" label="操作" width>
           <template slot-scope="scope">
             <span @click="editReason(scope.row)">编辑</span>
@@ -92,8 +92,8 @@
         <el-form-item label="是否启用" prop="isUse">
           <el-switch
             v-model="ruleForm.isUse"
-            :inactive-value="0"
-            :active-value="1"
+            :inactive-value="false"
+            :active-value="true"
             active-color="#5BC0BF"
           />
         </el-form-item>
@@ -146,18 +146,18 @@ export default {
       // 获取表格信息
       this.$axios({
         method: "post",
-        url: "api/return_reason/query_for_pageB",
+        url: this.$api.reason,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
-          merchantId: JSON.parse(localStorage.user).merchantId
+          // merchantId: JSON.parse(localStorage.user).merchantId
         }
       })
         .then(res => {
-          // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          console.log(res);
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           this.msg(err, "error");
@@ -165,14 +165,13 @@ export default {
     },
     //是否启用
     handleShowStatus($event, data) {
-      let show = $event ? 1 : 0;
       this.$axios({
         method: "post",
-        url: "api/return_reason/add",
+        url: this.$api.reason_add,
         data: {
           id: data.id,
-          isUse: show,
-          merchantId: JSON.parse(localStorage.user).merchantId
+          isUse: $event,
+          // merchantId: JSON.parse(localStorage.user).merchantId
         }
       })
         .then(res => {
@@ -191,17 +190,17 @@ export default {
     },
     submitRuleForm(formName) {
       if (this.isAdd) {
-        this.submitForm("api/return_reason/add", this.ruleForm, {
-          merchantId: JSON.parse(localStorage.user).merchantId
+        this.submitForm(this.$api.reason_add, this.ruleForm, {
+          // merchantId: JSON.parse(localStorage.user).merchantId
         });
-        this.msg("提交成功");
+        this.msg();
         setTimeout(() => {
           this.dialogVisible = false;
           this.getTableData();
         }, 50);
       } else {
-        this.submitForm("api/return_reason/add", this.ruleForm);
-        this.msg("提交成功");
+        this.submitForm(this.$api.reason_add, this.ruleForm);
+        this.msg();
         setTimeout(() => {
           this.dialogVisible = false;
           this.getTableData();
@@ -217,10 +216,8 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/return_reason/delete",
-          data: {
-            ids: ids
-          }
+          url: this.$api.reason_delete,
+          data: ids
         })
           .then(() => {
             this.msg("删除成功");
@@ -242,9 +239,6 @@ export default {
           this.msg("请选择操作", "error");
           break;
         case "删除":
-          this.remove(arr);
-          break;
-        case "关闭":
           this.remove(arr);
           break;
       }

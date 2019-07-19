@@ -17,11 +17,18 @@
         </div>
       </div>
       <div class="search-bottom" v-if="showSearch">
-        <div class="search-bar">订单编号：
+        <div class="search-bar">
+          订单编号：
           <el-input v-model="searchcode" placeholder="订单编号" clearable @change="getTableData(1)"/>
         </div>
-        <div class="search-bar">用户账户：
-          <el-input v-model="receiver" placeholder="用户账户/关键词" clearable @change="getTableData(1)"/>
+        <div class="search-bar">
+          用户账户：
+          <el-input
+            v-model="mobilePhone"
+            placeholder="用户账户/关键词"
+            clearable
+            @change="getTableData(1)"
+          />
         </div>
       </div>
     </div>
@@ -55,14 +62,14 @@
       >
         <el-table-column type="selection" width="56"/>
         <el-table-column prop="code" label="订单编号" width/>
-        <el-table-column prop="creatTime" label="提交时间" width="120"/>
+        <el-table-column prop="createTime" label="提交时间" width="120"/>
         <el-table-column prop="mobilePhone" label="用户账户" width/>
-        <el-table-column prop="totalMoeny" label="订单金额" width/>
+        <el-table-column prop="totalMoney" label="订单金额" width/>
         <el-table-column prop="payType" label="支付方式" width>
           <template slot-scope="scope">{{payTypeTxt(scope.row.payType)}}</template>
         </el-table-column>
         <el-table-column prop="payType" label="订单来源" width>
-          <template slot-scope="scope">{{payTypeTxt(scope.row.payType)}}</template>
+          <template slot-scope="scope">{{paySrcTxt(scope.row.paySrc)}}</template>
         </el-table-column>
         <el-table-column prop="status" label="订单状态" width>
           <template slot-scope="scope">{{orderStatus(scope.row.status)}}</template>
@@ -70,10 +77,11 @@
         <el-table-column label="订单操作" width>
           <template slot-scope="scope">
             <span
-              @click="$router.push({name:'order-detail',query:{orderId:scope.row.id,mobilePhone:scope.row.mobilePhone}})"
+              @click="$router.push({name:'order-detail',query:{orderId:scope.row.code,mobilePhone:scope.row.mobilePhone}})"
             >查看订单</span>
-            <span v-if="scope.row.status==2">订单发货</span>
-            <span v-if="scope.row.status==0">删除订单</span>
+            <span v-if="scope.row.status == 2">订单发货</span>
+            <span v-if="scope.row.status == 0">删除订单</span>
+            <span v-if="scope.row.status" @click="comfirmReceive([scope.row.code])">确认收货</span>
             <span
               v-if="scope.row.status==5||scope.row.status==6"
               @click="deliveryInfo(scope.row.id)"
@@ -127,7 +135,9 @@ export default {
       deliveryData: {},
       dialogVisible: false,
       editGoodsNo: "",
-      editProductInfo: ""
+      editProductInfo: "",
+      searchcode: "",
+      mobilePhone: ""
     };
   },
   created() {
@@ -145,16 +155,6 @@ export default {
   computed: {
     showSeachTxt() {
       return this.showSearch ? "收起筛选" : "展开筛选";
-    },
-    onSale() {
-      return this.tableData.filter(val => {
-        return val.status == 1;
-      }).length;
-    },
-    unSale() {
-      return this.tableData.filter(val => {
-        return val.status == 0;
-      }).length;
     }
   },
   methods: {
@@ -174,8 +174,11 @@ export default {
       this.getTableData();
     },
     //支付方式
+    paySrcTxt(type) {
+      return type == 1 ? "微信小程序" : "未知";
+    },
     payTypeTxt(type) {
-      return "微信小程序";
+      return type == 1 ? "微信支付" : "未知";
     },
     //订单状态
     orderStatus(status) {
@@ -211,21 +214,21 @@ export default {
     getTableData(page) {
       this.$axios({
         method: "post",
-        url: "api/merchant_order/query_for_page",
+        url: this.$api.order,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
-          merchantId: JSON.parse(localStorage.user).merchantId,
-          phone: this.receiver,
+          // merchantId: JSON.parse(localStorage.user).merchantId,
+          mobilePhone: this.mobilePhone,
           code: this.searchcode,
           status: 3
         }
       })
         .then(res => {
           // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           this.msg(err, "error");
@@ -251,6 +254,23 @@ export default {
           this.msg(err, "error");
         });
     },
+    //确认收货
+    comfirmReceive(ids) {
+      this.$axios({
+        method: "post",
+        url: this.$api.order_receive,
+        data: ids
+      })
+        .then(() => {
+          this.msg();
+          this.getTableData();
+        })
+        .catch(err => {
+          // console.log(err);
+          this.msg(err, "error");
+          this.getTableData();
+        });
+    },
     // 删除（批量+单个）
     remove(ids) {
       //id一定要为[]
@@ -261,7 +281,7 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchantGoods/delete_batch",
+          url: this.$api.delete,
           data: ids
         })
           .then(() => {

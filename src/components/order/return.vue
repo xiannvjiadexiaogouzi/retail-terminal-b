@@ -23,7 +23,7 @@
           )
         </p>
       </div>
-      <div class="search-filter" :class="status === 6 ?  'active' : ''" @click="handleStatus(6)">
+      <div class="search-filter" :class="status === 0 ?  'active' : ''" @click="handleStatus(0)">
         <p>
           已完成 (
           <span>{{orderCount.ywc}}</span>
@@ -56,18 +56,21 @@
         </div>
       </div>
       <div class="search-bottom" v-if="showSearch">
-        <div class="search-bar">订单编号：
+        <div class="search-bar">
+          订单编号：
           <el-input v-model="searchcode" placeholder="订单编号" clearable @change="getTableData(1)"/>
         </div>
-        <div class="search-bar">收货人：
-          <el-input v-model="receiver" placeholder="收货人姓名" clearable @change="getTableData(1)"/>
+        <div class="search-bar">
+          收货人：
+          <el-input v-model="mobilePhone" placeholder="用户账户" clearable @change="getTableData(1)"/>
         </div>
-        <div class="search-bar">申请时间：
+        <div class="search-bar">
+          申请时间：
           <el-date-picker
             v-model="date"
             type="date"
             format="yyyy-MM-dd"
-            value-format="yyyy-MM-dd hh:mm:ss"
+            value-format="yyyy-M-d"
             @change="getTableData()"
           />
         </div>
@@ -103,7 +106,7 @@
       >
         <el-table-column type="selection" width="56"/>
         <el-table-column prop="code" label="订单编号" width/>
-        <el-table-column prop="creatTime" label="申请时间" width="120"/>
+        <el-table-column prop="createTime" label="申请时间" width="120"/>
         <el-table-column prop="mobilePhone" label="用户账户" width/>
         <el-table-column prop="applicationReturnMoney" label="订单金额" width/>
         <el-table-column prop="status" label="申请状态" width>
@@ -111,8 +114,8 @@
         </el-table-column>
         <el-table-column label="订单操作" width>
           <template slot-scope="scope">
-            <span @click="$router.push({name:'return-detail',query:{orderId:scope.row.id}})">查看详情</span>
-            <span v-if="scope.row.status==0">删除订单</span>
+            <span @click="$router.push({name:'return-detail',query:{code: scope.row.code}})">查看详情</span>
+            <span v-if="scope.row.status==0" @click="remove([scope.row.code])">删除订单</span>
           </template>
         </el-table-column>
       </el-table>
@@ -159,7 +162,7 @@ export default {
       status: "",
       statusList: [-1, 1, 2, 3, 6],
       searchcode: null,
-      receiver: null,
+      mobilePhone: null,
       date: "",
       orderCount: {
         all: "",
@@ -176,15 +179,6 @@ export default {
   },
   created() {
     this.getTableData(1);
-    //分类数据
-    this.$axios("api/merchantGoodsType/query_goods_type_tree")
-      .then(res => {
-        // console.log(res);
-        this.productTypes = res.data.data;
-      })
-      .catch(err => {
-        this.msg(err, "error");
-      });
   },
   computed: {},
   methods: {
@@ -205,84 +199,82 @@ export default {
     },
     //订单状态
     returnStatus(status) {
-      //0关闭1待付款2待发货3已发货 4已收货5已评价 6已完成 20删除
+      //1待处理 2同意退货 3拒绝退货 4收到货确认退款 5收到货拒绝退款 6已完成 20删除
       switch (status) {
         case 1:
           return "待处理";
           break;
         case 2:
+        case 4:
+        case 5:
           return "同意退货";
           break;
         case 3:
           return "拒绝退货";
           break;
-        case 4:
-          return "收到货确认退款";
-          break;
-        case 5:
-          return "收到货拒绝退款";
-          break;
+          // return "收到货确认退款";
+          // break;
+          // return "收到货拒绝退款";
+          // break;
         default:
           return "已完成";
       }
     },
     //刷新页面，重新获取数据
     getTableData(page) {
-      //获取status数量
-      let promiseAll = this.statusList.map(val =>
-        this.$axios({
-          method: "post",
-          url: "api/merchant_return_goods/getCountByStatus",
-          data: {
-            merchantId: JSON.parse(localStorage.user).merchantId,
-            status: val === -1 ? "" : val
-          }
-        })
-      );
-      let that = this;
-      this.$axios.all(promiseAll).then(function(resArr) {
-        //   console.log(resArr)
-        resArr.forEach(function(res, i) {
-          let statusName = "";
-          switch (i) {
-            case 0:
-              statusName = "all";
-              break;
-            case 1:
-              statusName = "dcl";
-              break;
-            case 2:
-              statusName = "thz";
-              break;
-            case 3:
-              statusName = "yjj";
-              break;
-            case 4:
-              statusName = "ywc";
-              break;
-          }
-          that.orderCount[statusName] = res.data.data;
-        });
+      // //获取status数量
+      // let promiseAll = this.statusList.map(val =>
+      this.$axios({
+        method: "post",
+        url: this.$api.return_view
+      }).then(res => {
+        this.orderCount = res.data;
       });
+      // );
+      // let that = this;
+      // this.$axios.all(promiseAll).then(function(resArr) {
+      //   //   console.log(resArr)
+      //   resArr.forEach(function(res, i) {
+      //     let statusName = "";
+      //     switch (i) {
+      //       case 0:
+      //         statusName = "all";
+      //         break;
+      //       case 1:
+      //         statusName = "dcl";
+      //         break;
+      //       case 2:
+      //         statusName = "thz";
+      //         break;
+      //       case 3:
+      //         statusName = "yjj";
+      //         break;
+      //       case 4:
+      //         statusName = "ywc";
+      //         break;
+      //     }
+      //     that.orderCount[statusName] = res.data.data;
+      //   });
+      // });
       //表格数据
       this.$axios({
         method: "post",
-        url: "api/merchant_return_goods/query_for_page",
+        url: this.$api.return,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
-          merchantId: JSON.parse(localStorage.user).merchantId,
-          contact: this.receiver,
+          // merchantId: JSON.parse(localStorage.user).merchantId,
+          mobilePhone: this.mobilePhone,
           code: this.searchcode,
           status: this.status,
-          creatTime: this.date
+          createTime: this.date
         }
       })
         .then(res => {
           // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           this.msg(err, "error");
@@ -298,8 +290,8 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchant_return_goods/delete",
-          data: { ids: ids }
+          url: this.$api.return_delete,
+          data: ids
         })
           .then(() => {
             this.msg("删除成功");
@@ -316,7 +308,7 @@ export default {
     batchOperate() {
       let arr = [];
       this.tableSelection.forEach(item => {
-        arr.push(item.id);
+        arr.push(item.code);
       });
       switch (this.nowBatchOperation) {
         case "":

@@ -26,7 +26,7 @@
       <div class="search-filter" :class="status === 3 ?  'active' : ''" @click="handleStatus(3)">
         <p>
           已发货 (
-          <span>{{orderCount.dsh}}</span>
+          <span>{{orderCount.yfh}}</span>
           )
         </p>
       </div>
@@ -67,7 +67,7 @@
           <el-input v-model="searchcode" placeholder="订单编号" clearable @change="getTableData(1)"/>
         </div>
         <div class="search-bar">用户账户：
-          <el-input v-model="receiver" placeholder="用户账户/关键词" clearable @change="getTableData(1)"/>
+          <el-input v-model="mobilePhone" placeholder="用户账户/关键词" clearable @change="getTableData(1)"/>
         </div>
       </div>
     </div>
@@ -101,14 +101,14 @@
       >
         <el-table-column type="selection" prop="status" width="56" :selectable="selectable"/>
         <el-table-column prop="code" label="订单编号" width/>
-        <el-table-column prop="creatTime" label="提交时间" width="120"/>
+        <el-table-column prop="createTime" label="提交时间" width="120"/>
         <el-table-column prop="mobilePhone" label="用户账户" width/>
-        <el-table-column prop="totalMoeny" label="订单金额" width/>
+        <el-table-column prop="totalMoney" label="订单金额" width/>
         <el-table-column prop="payType" label="支付方式" width>
           <template slot-scope="scope">{{payTypeTxt(scope.row.payType)}}</template>
         </el-table-column>
         <el-table-column prop="payType" label="订单来源" width>
-          <template slot-scope="scope">{{payTypeTxt(scope.row.payType)}}</template>
+          <template slot-scope="scope">{{paySrcTxt(scope.row.paySrc)}}</template>
         </el-table-column>
         <el-table-column prop="status" label="订单状态" width>
           <template slot-scope="scope">{{orderStatus(scope.row.status)}}</template>
@@ -116,15 +116,15 @@
         <el-table-column label="订单操作" width>
           <template slot-scope="scope">
             <span
-              @click="$router.push({name:'order-detail',query:{orderId:scope.row.id,mobilePhone:scope.row.mobilePhone}})"
+              @click="$router.push({name:'order-detail',query:{orderId:scope.row.code,mobilePhone:scope.row.mobilePhone}})"
             >查看订单</span>
             <span v-if="scope.row.status==2">订单发货</span>
-            <span v-if="scope.row.status==0" @click="remove([scope.row.id])">删除订单</span>
+            <span v-if="scope.row.status == 7 || scope.row.status == 0" @click="remove([scope.row.code])">删除订单</span>
             <span
-              v-if="scope.row.status==5||scope.row.status==6"
-              @click="deliveryInfo(scope.row.id)"
+              v-if="scope.row.status > 2 && scope.row.status <= 6"
+              @click="deliveryInfo(scope.row.code)"
             >追踪订单</span>
-            <span v-if="scope.row.status==1" @click="close([scope.row.id])">关闭订单</span>
+            <span v-if="scope.row.status==1" @click="close([scope.row.code])">关闭订单</span>
           </template>
         </el-table-column>
       </el-table>
@@ -177,9 +177,9 @@ export default {
   },
   data() {
     return {
-      status: "",
+      status: '',
       searchcode: null,
-      receiver: null,
+      mobilePhone: null,
       orderCount: {},
       deliveryData: {},
       dialogVisible: false,
@@ -210,8 +210,11 @@ export default {
       this.getTableData();
     },
     //支付方式
+    paySrcTxt(type) {
+      return type == 1 ? "微信小程序":'未知';
+    },
     payTypeTxt(type) {
-      return "微信小程序";
+      return type == 1 ? "微信支付":'未知';
     },
     //订单状态
     orderStatus(status) {
@@ -238,7 +241,7 @@ export default {
         case 6:
           return "已完成";
           break;
-        case 20:
+        case 7:
           return "已删除";
           break;
       }
@@ -248,14 +251,14 @@ export default {
       //获取status数量
       this.$axios({
         method: "post",
-        url: "api/merchant_order/getOrderAllCount",
-        data: {
-          merchantId: JSON.parse(localStorage.user).merchantId
-        }
+        url: this.$api.order_view,
+        // data: {
+        //   merchantId: JSON.parse(localStorage.user).merchantId
+        // }
       })
         .then(res => {
           // console.log(res);
-          this.orderCount = res.data.data;
+          this.orderCount = res.data;
         })
         .catch(err => {
           // console.log(err);
@@ -264,21 +267,21 @@ export default {
       //order-list data
       this.$axios({
         method: "post",
-        url: "api/merchant_order/query_for_page",
+        url: this.$api.order,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
-          merchantId: JSON.parse(localStorage.user).merchantId,
-          phone: this.receiver || null,
+          // merchantId: JSON.parse(localStorage.user).merchantId,
+          mobilePhone: this.mobilePhone || null,
           code: this.searchcode || null,
           status: this.status
         }
       })
         .then(res => {
           // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           this.msg(err, "error");
@@ -303,14 +306,14 @@ export default {
       this.dialogVisible = true;
       this.$axios({
         method: "post",
-        url: "api/merchant_order/query_By_Id",
+        url: this.$api.order_detail,
         data: {
-          id: id,
-          merchantId: JSON.parse(localStorage.user).merchantId
+          code: id,
+          // merchantId: JSON.parse(localStorage.user).merchantId
         }
       })
         .then(res => {
-          this.deliveryData = res.data.data;
+          this.deliveryData = res.data;
         })
         .catch(err => {
           this.msg(err, "error");
@@ -319,6 +322,7 @@ export default {
     //关闭订单
     close(ids) {
       //id一定要为[]
+      console.log(ids)
       this.$confirm("确定关闭?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -326,8 +330,8 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchant_order/close",
-          data: { ids }
+          url: this.$api.order_close,
+          data: ids
         })
           .then(() => {
             this.msg("关闭成功");
@@ -351,8 +355,8 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchant_order/delete",
-          data: { ids: ids }
+          url: this.$api.order_delete,
+          data: ids
         })
           .then(() => {
             this.msg("删除成功");
@@ -369,7 +373,7 @@ export default {
     batchOperate() {
       let arr = [];
       this.tableSelection.forEach(item => {
-        arr.push(item.id);
+        arr.push(item.code);
       });
       switch (this.nowBatchOperation) {
         case "":
@@ -379,7 +383,7 @@ export default {
           this.remove(arr);
           break;
         case "关闭":
-          this.remove(arr);
+          this.close(arr);
           break;
       }
     },

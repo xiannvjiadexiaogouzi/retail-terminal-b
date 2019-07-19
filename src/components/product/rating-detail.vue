@@ -110,14 +110,14 @@ export default {
     getTableData() {
       this.$axios({
         method: "post",
-        url: "api/merchantGoodsComment/merchant_goods_type_list_page",
+        url: this.$api.comment,
         data: {
           id: this.$route.params.userId
         }
       })
         .then(res => {
           console.log(res);
-          this.commentData = res.data.data.list[0];
+          this.commentData = res.data.data[0];
         })
         .catch(err => {
           // console.log(err);
@@ -130,11 +130,11 @@ export default {
         //先检验表单
         if (valid) {
           this.submitForm(
-            "api/merchantGoodsComment/merchant_comment_reply",
+            this.$api.comment_reply,
             this.ruleForm
           );
           this.msg();
-          this.goBack();
+          this.push({name: 'rating'});
         } else {
           // console.log("error submit!!");
           this.msg("error submit!!", "error");

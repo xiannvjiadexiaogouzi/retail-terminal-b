@@ -17,10 +17,12 @@
         </div>
       </div>
       <div class="search-bottom" v-if="showSearch">
-        <div class="search-bar">输入搜索：
+        <div class="search-bar">
+          输入搜索：
           <el-input v-model="name" clearable placeholder="商品名称 / 商品货号" @change="getTableData()"/>
         </div>
-        <div class="search-bar">操作类型：
+        <!-- <div class="search-bar">
+          操作类型：
           <el-select v-model="typeId" clearable placeholder="请选择操作类型" @change="getTableData()">
             <el-option
               v-for="item in productTypes"
@@ -29,8 +31,9 @@
               :value="item.code"
             />
           </el-select>
-        </div>
-        <div class="search-bar">操作时间：
+        </div> -->
+        <div class="search-bar">
+          操作时间：
           <el-date-picker
             v-model="date"
             type="daterange"
@@ -72,28 +75,30 @@
         <el-table-column prop="id" label="编号" width="60"/>
         <el-table-column prop="goodsImg" label="商品图片" width>
           <template slot-scope="scope">
-            <img :src="handleImg(scope.row.goodsImg)" alt>
+            <img :src="adjustImg(scope.row.goods.goodsImg[0])" alt>
           </template>
         </el-table-column>
         <el-table-column prop="name" label="商品名称" width>
           <template slot-scope="scope">
-            <p>{{scope.row.goodsName}}</p>
-            <p>品牌：{{scope.row.brandName}}</p>
+            <p>{{scope.row.goods.goodsName}}</p>
+            <p>品牌：{{scope.row.goods.brandName}}</p>
           </template>
         </el-table-column>
-        <el-table-column prop="goodsNo" label="货号/属性" width>
+        <el-table-column prop="goods.goodsNo" label="货号/属性" width>
           <template slot-scope="scope">
-            <p>{{scope.row.goodsNo}}/{{scope.row.property}}</p>
+            <p>{{scope.row.goods.goodsNo}}/{{scope.row.goods.typeName}}</p>
           </template>
         </el-table-column>
-        <el-table-column prop="orderCode" label="订单号" width/>
+        <el-table-column prop="order.code" label="订单号" width/>
         <el-table-column prop="stock" label="库存" width>
           <template slot-scope="scope">
-            <p>数量: {{ scope.row.changeNumber }}</p>
+            <p>数量: {{ scope.row.order.totalNum }}</p>
             <p>剩余: {{ scope.row.changeAfter }}</p>
           </template>
         </el-table-column>
-        <el-table-column prop="operateTypeName" label="操作类型" width/>
+        <el-table-column prop="operateType" label="操作类型" width>
+          <template slot-scope="scope">{{adjustType(scope.row.operateType)}}</template>
+        </el-table-column>
         <el-table-column prop="createTime" label="操作信息" width="180"/>
       </el-table>
       <!-- 表格批量操作+页码 -->
@@ -127,7 +132,7 @@ export default {
     return {
       stockTypeList: "",
       date: "",
-      name:'',
+      name: "",
       beginTime: "",
       endTime: ""
     };
@@ -139,38 +144,38 @@ export default {
   },
   computed: {},
   methods: {
-    // 获取入库类型
-    getStockType(type) {
-      this.$axios({
-        method: "post",
-        url: "api/merchant_goods_log/query_type",
-        type: "form",
-        data: { type: type },
-        //使用qs模块转化data为form格式提交
-        transformRequest: [
-          function(data) {
-            data = Qs.stringify(data);
-            return data;
-          }
-        ],
-        // 修改header为formdata格式
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
-      })
-        .then(res => {
-          // console.log(res);
-          this.productTypes = res.data.data;
-        })
-        .catch(err => {
-          this.msg(err, "error");
-        });
-    },
+    // // 获取入库类型
+    // getStockType(type) {
+    //   this.$axios({
+    //     method: "post",
+    //     url: this.$api.stock_list,
+    //     // type: "form",
+    //     data: { operateType: type }
+    //     // //使用qs模块转化data为form格式提交
+    //     // transformRequest: [
+    //     //   function(data) {
+    //     //     data = Qs.stringify(data);
+    //     //     return data;
+    //     //   }
+    //     // ],
+    //     // // 修改header为formdata格式
+    //     // headers: {
+    //     //   "Content-Type": "application/x-www-form-urlencoded"
+    //     // }
+    //   })
+    //     .then(res => {
+    //       // console.log(res);
+    //       this.productTypes = res.data.data;
+    //     })
+    //     .catch(err => {
+    //       this.msg(err, "error");
+    //     });
+    // },
     //刷新页面，重新获取数据
     getTableData(page) {
       this.$axios({
         method: "post",
-        url: "api/merchant_goods_log/query_for_page",
+        url: this.$api.stock,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
@@ -179,18 +184,21 @@ export default {
           beginTime: this.beginTime,
           endTime: this.endTime,
           orderCode: "",
-          type: 0 //1入库 0 出库
+          operateType: 0 //1入库 0 出库
         }
       })
         .then(res => {
           // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           this.msg(err, "error");
         });
+    },
+    adjustType(type) {
+      return type ? "入库" : "出库";
     },
     //更改日期搜索
     handleDate($date) {

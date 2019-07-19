@@ -5,7 +5,7 @@
         <el-step title="步骤1" description="选择商品分类"/>
         <el-step title="步骤2" description="填写商品信息"/>
         <el-step title="步骤3" description="填写商品属性"/>
-        <el-step title="步骤4" description="选择商品关联"/>
+        <!-- <el-step title="步骤4" description="选择商品关联"/> -->
       </el-steps>
     </header>
     <div class="step" v-if="step==1">
@@ -108,190 +108,8 @@
             <el-button @click="step--">上一步,选择商品分类</el-button>
             <el-button type="primary" @click="step2to3('ruleForm')">下一步,填写商品属性</el-button>
           </el-form-item>
-          <!-- <el-form-item label="运费模版" prop="expense">
-            <el-select v-model="value" placeholder="请选择品牌">
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              ></el-option>
-            </el-select>
-          </el-form-item>
         </el-form>
       </div>
-      <div class="small-step">
-        <div class="tag">库存规格</div>
-        <el-form
-          :model="basicInfo"
-          :rules="rules"
-          ref="ruleForm"
-          label-width="100px"
-          class="demo-ruleForm"
-        >
-          <el-form-item label="商品货号" prop="type">
-            <el-input v-model="basicInfo.name"/>
-            <p>如果您不输入商品货号，系统将自动生成一个唯一的货号</p>
-          </el-form-item>
-          <el-form-item label="商品售价" prop="name">
-            <el-input v-model="basicInfo.name"/>
-          </el-form-item>
-          <el-form-item label="市场价" prop="subName">
-            <el-input v-model="basicInfo.subName"/>
-          </el-form-item>
-          <el-form-item label="商品库存" prop="brand">
-            <el-input type="number" v-model="basicInfo.name"/>
-            <p>该设置只对单品有效，当商品存在多规格货品时为不可编辑状态，库存数值取决于货品数量</p>
-          </el-form-item>
-          <el-form-item label="库存预警值" prop="introduction">
-            <el-input type="number" v-model="basicInfo.name"/>
-          </el-form-item>
-          <el-form-item label="计量单位" prop="expense">
-            <el-input v-model="basicInfo.name"/>
-          </el-form-item>
-          <el-form-item label="商品重量" prop="introduction">
-            <el-input type="number" v-model="basicInfo.name"/>
-          </el-form-item>-->
-        </el-form>
-      </div>
-      <!-- <div class="small-step">
-        <div class="tag">其他信息</div>
-        <el-form ref="form" :model="form" label-width="80px">
-          <el-form-item label="预告商品">
-            <el-switch v-model="form.delivery"/>
-            <p>如果设置为预告商品，商品上架和商品推荐不可用</p>
-          </el-form-item>
-          <el-form-item label="商品上架">
-            <el-switch v-model="form.delivery"/>
-          </el-form-item>
-          <el-form-item label="商品推荐">
-            <el-checkbox-group v-model="form.type">
-              <el-checkbox label="新品" name="type"/>
-              <el-checkbox label="推荐" name="type"/>
-            </el-checkbox-group>
-          </el-form-item>
-          <el-form-item label="服务保证">
-            <el-checkbox-group v-model="form.type">
-              <el-checkbox label="无忧退货" name="type"/>
-              <el-checkbox label="快速退款" name="type"/>
-              <el-checkbox label="包邮免费" name="type"/>
-            </el-checkbox-group>
-          </el-form-item>
-          <el-form-item label="详细页标题">
-            <el-input v-model="basicInfo.name"/>
-          </el-form-item>
-          <el-form-item label="详细页描述">
-            <el-input v-model="basicInfo.name"/>
-          </el-form-item>
-          <el-form-item label="商品关键词">
-            <el-input v-model="basicInfo.name"/>
-          </el-form-item>
-          <el-form-item label="商品备注">
-            <el-input type="textarea" v-model="basicInfo.name"/>
-          </el-form-item>
-        </el-form>
-      </div>
-      <div class="small-step">
-        <div class="tag">特殊信息</div>
-        <el-form ref="form" :model="form" label-width="80px">
-          <el-form-item label="特惠促销">
-            <el-radio-group v-model="form.resource">
-              <el-radio label="是"/>
-              <el-radio label="否"/>
-            </el-radio-group>
-            <div class="row">
-              <el-date-picker
-                type="date"
-                placeholder="选择开时间"
-                v-model="form.date1"
-                style="width: 100%;"
-              />
-              <el-date-picker
-                type="date"
-                placeholder="选择结束时间"
-                v-model="form.date1"
-                style="width: 100%;"
-              />
-              <el-input v-model="basicInfo.name"/>
-            </div>
-          </el-form-item>
-          <el-form-item label="商品限购">
-            <el-radio-group v-model="form.resource">
-              <el-radio label="是"/>
-              <el-radio label="否"/>
-            </el-radio-group>
-            <div class="row">
-              <el-date-picker
-                type="date"
-                placeholder="选择开时间"
-                v-model="form.date1"
-                style="width: 100%;"
-              />
-              <el-date-picker
-                type="date"
-                placeholder="选择结束时间"
-                v-model="form.date1"
-                style="width: 100%;"
-              />
-              <el-input v-model="basicInfo.name"/>
-            </div>
-          </el-form-item>
-          <el-form-item label="阶梯价格">
-            <el-radio-group v-model="form.resource">
-              <el-radio label="是"/>
-              <el-radio label="否"/>
-            </el-radio-group>
-            <table>
-              <tr>
-                <th>数量</th>
-                <th>价格</th>
-                <th>操作</th>
-              </tr>
-              <tr>
-                <td>
-                  <el-input type="number" v-model="basicInfo.name"/>
-                </td>
-                <td>
-                  <el-input type="number" v-model="basicInfo.name"/>
-                </td>
-                <td>
-                  <span>删除</span>
-                  <span>添加</span>
-                </td>
-              </tr>
-            </table>
-          </el-form-item>
-          <el-form-item label="满减价格">
-            <el-radio-group v-model="form.resource">
-              <el-radio label="是"/>
-              <el-radio label="否"/>
-            </el-radio-group>
-            <table>
-              <tr>
-                <th>满</th>
-                <th>立减</th>
-                <th>操作</th>
-              </tr>
-              <tr>
-                <td>
-                  <el-input type="number" v-model="basicInfo.name"/>
-                </td>
-                <td>
-                  <el-input type="number" v-model="basicInfo.name"/>
-                </td>
-                <td>
-                  <span>删除</span>
-                  <span>添加</span>
-                </td>
-              </tr>
-            </table>
-          </el-form-item>
-        </el-form>
-      </div>-->
-      <!-- <div class="btn-row">
-        <div class="btn" @click="step2to1">下一步，填写商品分类</div>
-        <div class="nxt btn" @click="step1to2">下一步，填写商品属性</div>
-      </div>-->
     </div>
     <div class="step" v-if="step==3">
       <div class="small-step">
@@ -419,7 +237,7 @@
         <div class="upload-wrapper">
           <dir class="pic-list">
             <div class="pic-wrapper" v-for="(pic,index) in imgList" :key="index">
-              <img :src="pic" alt>
+              <img :src="adjustImg(pic)" alt>
               <div>
                 <span class="red" v-if="index == 0">商品主图</span>
                 <span class="operation" v-if="index !== 0" @click="mainImg(pic,index)">设为主图</span>
@@ -449,10 +267,10 @@
       </div>
       <div class="btn-row">
         <el-button @click="step--">上一步,填写商品信息</el-button>
-        <el-button type="primary" @click="step3to4">下一步,选择商品关联</el-button>
+        <el-button type="primary" @click="submitRuleForm('ruleForm')">完成，提交表单</el-button>
       </div>
     </div>
-    <div class="step" v-if="step==4">
+    <!-- <div class="step" v-if="step==4">
       <div class="small-step">
         <div class="tag">关联类目</div>
         <div class="select-info-wrapper">
@@ -488,7 +306,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div>-->
     <!-- 从图片库选择 -->
     <el-dialog title="从图片库选择" :visible.sync="dialogVisible" width>
       <p class>
@@ -508,9 +326,9 @@
           <span v-if="tableData.length == 0">请先选择相册</span>
           <el-checkbox-group v-model="checkList">
             <div v-for="item in tableData" :key="item.id" class="check-item">
-              <img :src="item.imgUrl" alt>
+              <img :src="adjustImg(item)" alt>
               <div class="item-operation">
-                <el-checkbox :label="item.imgUrl"/>
+                <el-checkbox :label="item"/>
               </div>
             </div>
           </el-checkbox-group>
@@ -584,8 +402,8 @@ export default {
       album: "", //相册id selector
       albumName: "", //当前相册名
       imgList: [], //展示商品图片
-      navList: [], //一级类目列表
-      childNavList: [], //二级类目列表
+      // navList: [], //一级类目列表
+      // childNavList: [], //二级类目列表
       ruleForm: {
         //step1
         typeId: "", //一级分类
@@ -601,15 +419,15 @@ export default {
         goodsImg: "",
         goodsPrice: "",
         marketPrice: "",
-        goodsStock: "",
-        goodsWarning: "",
+        goodsStock: 0,
+        goodsWarning: 0,
         goodsUnit: "",
         goodsWeight: "",
         //step3
         styleId: "",
         styleName: "",
-        navId: "", //一级类目
-        navChildId: "", //二级类目
+        // navId: "", //一级类目
+        // navChildId: "", //二级类目
         merchantGoodsTypePropertyList: [], //prop 属性
         merchantParamDetailIds: {
           //param 参数
@@ -654,7 +472,7 @@ export default {
     this.getStep0Data();
     this.getStep1Data();
     this.getStep2Data();
-    this.getStep4Data();
+    // this.getStep4Data();
     if (!this.isAdd) {
       this.getProduct();
     }
@@ -665,13 +483,13 @@ export default {
     getProduct() {
       this.$axios({
         method: "post",
-        url: "api//merchantGoods/merchant_goods_by_id",
+        url: this.$api.product_detail,
         data: {
           id: this.$route.query.id
         }
       })
         .then(res => {
-          // console.log(res);
+          console.log(res);
           this.ruleForm = res.data.data;
           //调整step0 一级、二级分类
           this.$nextTick(() => {
@@ -681,13 +499,13 @@ export default {
                 return;
               }
             });
-            //调整step4 关联类目
-            this.navList.forEach(item => {
-              if (item.id === this.ruleForm.navId) {
-                this.childNavList = item.list;
-                return;
-              }
-            });
+            // //调整step4 关联类目
+            // this.navList.forEach(item => {
+            //   if (item.id === this.ruleForm.navId) {
+            //     this.childNavList = item.list;
+            //     return;
+            //   }
+            // });
           });
           //调整selectedPropName
           res.data.data.merchantGoodsTypePropertyList[0].nameValue.forEach(
@@ -700,39 +518,39 @@ export default {
           //获取paramSelectList
           this.getParam(res.data.data.styleId);
           //获取goodsImg
-          this.imgList = res.data.data.goodsImg.split(",");
+          this.imgList = res.data.data.goodsImg;
         })
         .catch(err => {
           // console.log(err);
-          this.msg(err, 'error');
+          this.msg(err, "error");
         });
     },
     // 一级、二级分类（step0）
     getStep0Data() {
       this.$axios({
-        method: "post",
-        url: "api/merchantGoodsType/query_goods_type_tree"
+        method: "get",
+        url: this.$api.type_list
       })
         .then(res => {
-          // console.log(res);
-          this.firstTypeList = res.data.data;
+          console.log(res);
+          this.firstTypeList = res.data;
         })
         .catch(err => {
-          this.msg(err, 'error');
+          this.msg(err, "error");
         });
     },
     // 商品品牌（step1）
     getStep1Data() {
       this.$axios({
-        method: "post",
-        url: "api/merchant_goods_brand/query_list"
+        method: "get",
+        url: this.$api.brand_list
       })
         .then(res => {
           // console.log(res);
-          this.brandList = res.data.data;
+          this.brandList = res.data;
         })
         .catch(err => {
-          this.msg(err, 'error');
+          this.msg(err, "error");
         });
     },
     //step2
@@ -740,7 +558,7 @@ export default {
       //商品类型
       this.$axios({
         method: "post",
-        url: "api/merchantGoodsStyle/merchant_goods_style_list_page",
+        url: this.$api.style,
         data: {
           currentPage: 1,
           pageSize: 100
@@ -748,15 +566,15 @@ export default {
       })
         .then(res => {
           // console.log(res);
-          this.styleList = res.data.data.list;
+          this.styleList = res.data.data;
         })
         .catch(err => {
-          this.msg(err, 'error');
+          this.msg(err, "error");
         });
       //图片
       this.$axios({
         method: "post",
-        url: "api/merchant_goods_galleries/query_for_page",
+        url: this.$api.pics,
         data: {
           currentPage: 1,
           pageSize: 100
@@ -764,10 +582,10 @@ export default {
       })
         .then(res => {
           // console.log(res);
-          this.galleries = res.data.data.list;
+          this.galleries = res.data.data;
         })
         .catch(err => {
-          this.msg(err, 'error');
+          this.msg(err, "error");
         });
     },
     //获取规格 & param
@@ -781,7 +599,7 @@ export default {
       //获得规格
       this.$axios({
         method: "post",
-        url: "api/merchantGoodsProperty/merchant_goods_property_list_page",
+        url: this.$api.property,
         data: {
           styleId: $val,
           currentPage: 1,
@@ -791,16 +609,16 @@ export default {
         .then(res => {
           // console.log(res);
           let list = [];
-          res.data.data.list.map(item => {
+          res.data.data.map(item => {
             list.push({
               name: item.propertyName,
-              list: item.propertyList.split(",")
+              list: item.propertyList
             });
           });
           this.propList = list;
         })
         .catch(err => {
-          this.msg(err, 'error');
+          this.msg(err, "error");
         });
       //获得param
       this.getParam($val);
@@ -809,7 +627,7 @@ export default {
     getParam($val) {
       this.$axios({
         method: "post",
-        url: "api/merchantGoodsParam/merchant_goods_property_list_page",
+        url: this.$api.param,
         data: {
           styleId: $val,
           currentPage: 1,
@@ -819,11 +637,11 @@ export default {
         .then(res => {
           // console.log(res);
           if (this.isAdd) {
-            this.handleParam(res.data.data.list);
+            this.handleParam(res.data.data);
           }
           //可能出现已有商品无对应参数列表
-          if (res.data.data.list.length) {
-            this.paramSelectList = res.data.data.list;
+          if (res.data.data.length) {
+            this.paramSelectList = res.data.data;
           } else {
             this.ruleForm.merchantParamDetailIds.merchantParamDetails.forEach(
               item => {
@@ -833,7 +651,7 @@ export default {
           }
         })
         .catch(err => {
-          this.msg(err, 'error');
+          this.msg(err, "error");
         });
     },
     //获取相册图片
@@ -847,34 +665,34 @@ export default {
       });
       this.$axios({
         method: "post",
-        url: "api/merchant_goods_galleries_detail/query_for_page",
+        url: this.$api.pics_img,
         data: {
-          galleriesId: $val,
+          picsId: $val,
           currentPage: this.currentPage,
           pageSize: this.pageSize
         }
       }).then(res => {
         // console.log(res);
-        this.tableData = res.data.data.list;
-        this.totalPage = res.data.data.totalPage;
-        this.currentPage = res.data.data.currentPage;
-        this.dataCount = res.data.data.totalCount;
+        this.tableData = res.data.data;
+        this.totalPage = res.data.totalPage;
+        this.currentPage = res.data.currentPage;
+        this.dataCount = res.data.totalCount;
       });
     },
-    //获取关联类目 step4
-    getStep4Data() {
-      this.$axios({
-        method: "post",
-        url: "api/merchantNavigation/query_navigation_type_tree"
-      })
-        .then(res => {
-          // console.log(res);
-          this.navList = res.data.data;
-        })
-        .catch(err => {
-          // console.log(err);
-        });
-    },
+    // //获取关联类目 step4
+    // getStep4Data() {
+    //   this.$axios({
+    //     method: "post",
+    //     url: "api/merchantNavigation/query_navigation_type_tree"
+    //   })
+    //     .then(res => {
+    //       // console.log(res);
+    //       this.navList = res.data.data;
+    //     })
+    //     .catch(err => {
+    //       // console.log(err);
+    //     });
+    // },
     //规格结果
     handleSelectedProp(prop, subprop, e) {
       if (e) {
@@ -936,9 +754,9 @@ export default {
       nameValueList.forEach(item => {
         this.ruleForm.merchantGoodsTypePropertyList.push({
           nameValue: item instanceof Array ? item : [item],
-          goodsSalePrice: "",
-          goodsStock: "",
-          stockWarning: ""
+          goodsSalePrice: 0,
+          goodsStock: 0,
+          stockWarning: 0
         });
       });
     },
@@ -976,6 +794,7 @@ export default {
     },
     //处理param
     handleParam(data) {
+      // console.log(data);
       let len = data.length;
       for (let i = 0; i < len; i++) {
         this.ruleForm.merchantParamDetailIds.merchantParamDetails.push({
@@ -985,7 +804,8 @@ export default {
       }
     },
     handleParamList(val) {
-      return val.split(",");
+      // console.log(val);
+      return val;
     },
     //选择一级分类
     selectFirstType(id, list, name) {
@@ -1017,7 +837,14 @@ export default {
         this.msg("最多上传5张图片", "error");
       } else {
         this.checkList.forEach(url => {
+          // for (let i = 0, len = this.imgList.length; i < len; i++) {
+          //   if (url._id === this.imgList[i]._id) {
+          //     this.msg("重复选择图片", "error");
+          //     break;
+          //   }else{
           this.imgList.push(url);
+          // }
+          // }
         });
         this.dialogVisible = false;
       }
@@ -1031,14 +858,14 @@ export default {
     delImg(index) {
       this.imgList.splice(index, 1);
     },
-    //选择一级类目
-    selectFirstNav(id, list, name) {
-      this.ruleForm.navId = id;
-      this.childNavList = list;
-    },
-    selectSecondNav(list) {
-      this.ruleForm.navChildId = list.id;
-    },
+    // //选择一级类目
+    // selectFirstNav(id, list, name) {
+    //   this.ruleForm.navId = id;
+    //   this.childNavList = list;
+    // },
+    // selectSecondNav(list) {
+    //   this.ruleForm.navChildId = list.id;
+    // },
     //下一页
     step1to2() {
       if (!this.ruleForm.typeId) {
@@ -1048,7 +875,7 @@ export default {
       }
     },
     step2to3() {
-      if (this.ruleForm.goodsStock < this.ruleForm.goodsWarning) {
+      if (parseInt(this.ruleForm.goodsStock) < parseInt(this.ruleForm.goodsWarning)) {
         this.msg("库存预警大于商品库存", "error");
         return;
       }
@@ -1095,7 +922,7 @@ export default {
           this.msg("规格列表数值最大为99999", "error");
           return;
         }
-        if (prop[i].goodsStock < prop[i].stockWarning) {
+        if (parseInt(prop[i].goodsStock) < parseInt(prop[i].stockWarning)) {
           this.msg("库存预警大于商品库存", "error");
           return;
         }
@@ -1123,21 +950,21 @@ export default {
     },
     //提交表单
     submitRuleForm(formName) {
-      if (this.ruleForm.navId && !this.ruleForm.navChildId) {
-        this.msg("选了一级类目必须选择二级类目", "error");
-        return;
-      }
-      this.ruleForm.goodsImg = this.imgList.join(",");
+      // if (this.ruleForm.navId && !this.ruleForm.navChildId) {
+      //   this.msg("选了一级类目必须选择二级类目", "error");
+      //   return;
+      // }
+      this.ruleForm.goodsImg = this.imgList;
       this.ruleForm.merchantSpecifications = this.selectedPropList;
       let data = JSON.parse(JSON.stringify(this.ruleForm));
       if (this.isAdd) {
         //判断是否新增
-        this.submitForm("api/merchantGoods/merchant_goods_add", data);
+        this.submitForm(this.$api.product_add, data);
       } else {
-        this.submitForm("api/merchantGoods/merchant_goods_update", data);
+        this.submitForm(this.$api.product_update, data);
       }
       this.msg();
-      this.goBack();
+      this.$router.push({ name: "product-list" });
     }
   }
 };

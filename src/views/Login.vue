@@ -4,12 +4,13 @@
     <div class="login-wrapper">
       <div class="login">
         <div class="title">后台业务管理系统</div>
-        <el-input v-model="user" placeholder="请输入用户名称" clearable/>
-        <el-input type="password" v-model="password" placeholder="请输入登录密码" clearable/>
+        <el-input v-model="user" placeholder="请输入用户名称" clearable />
+        <el-input type="password" v-model="password" placeholder="请输入登录密码" clearable />
         <transition name="alert-trans">
           <el-alert type="warning" center show-icon v-if="showAlert">{{text}}</el-alert>
         </transition>
         <el-button @click="loginIn">登 录</el-button>
+        <!-- <el-button @click="register">注 册</el-button> -->
       </div>
       <footer>
         <p>copyright....</p>
@@ -21,9 +22,11 @@
 <script>
 //使用axios中的qs模块转化request
 import Qs from "qs";
+import mixin from "../util/mixin";
 
 export default {
-  name:'login',
+  name: "login",
+  mixins: [mixin],
   data() {
     return {
       showAlert: false,
@@ -37,69 +40,103 @@ export default {
     // loginName: "13932493200",
     // loginPassword: "000000"
   },
+  // created() {
+  //   this.$axios({
+  //     method: "get",
+  //     url: this.$api.host
+  //     // url: 'http://68.168.131.20'
+  //   }).then(res => console.log(res));
+  // },
   methods: {
-    alertShow() {
-      this.showAlert = true;
-      setTimeout(() => {
-        this.showAlert = false;
-      }, 3000);
-    },
+    // alertShow() {
+    //   this.showAlert = true;
+    //   setTimeout(() => {
+    //     this.showAlert = false;
+    //   }, 3000);
+    // },
     loginIn() {
       //检查填写
       if (!this.user) {
-        this.text = "请填写用户名称";
-        this.alertShow();
+        // this.text = "请填写用户名称";
+        // this.alertShow();
+        this.msg("请填写用户名称", "error");
       } else if (!this.password) {
-        this.text = "请填写登录密码";
-        this.alertShow();
+        // this.text = "请填写登录密码";
+        // this.alertShow();
+        this.msg("请填写登录密码", "error");
       } else {
         //发送请求
         this.$axios({
           method: "post",
-          url: "api/merchant/login",
-          type: "form",
+          url: this.$api.login,
+          // url: '68.168.131.20/merchant/login',
+          // url: "api/merchant/login",
+          // type: "form",
           data: {
-            loginName: this.user,
-            loginPassword: this.password
-          },
-          //使用qs模块转化data为form格式提交
-          transformRequest: [
-            function(data) {
-              data = Qs.stringify(data);
-              return data;
-            }
-          ],
-          // 修改header为formdata格式
-          headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            // loginName: this.user,
+            // loginPassword: this.password
+            username: this.user,
+            password: this.password
+          }
+          // //使用qs模块转化data为form格式提交
+          // transformRequest: [
+          //   function(data) {
+          //     data = Qs.stringify(data);
+          //     return data;
+          //   }
+          // ],
+          // // 修改header为formdata格式
+          // headers: { "Content-Type": "application/x-www-form-urlencoded" }
         })
           .then(res => {
-            // console.log(res);
+            console.log(res);
             //验证成功
-            if (res.data.errno == 200 && res.data.msg === "返回成功") {
-              this.text = "登陆成功";
-              this.alertShow();
+            if (res.data.msg === "返回成功") {
+              // this.text = "登陆成功";
+              this.msg("登陆成功");
+              // this.alertShow();
               //存储用户信息 --> vuex
               // console.log(res)
-              this.$store.commit("SET_USER", JSON.stringify(res.data.data));
-              localStorage.userId = res.data.data.userId;
-              localStorage.userMobile = res.data.data.merchantMobile;
-              localStorage.merchantId_ID = res.data.data.merchantId;
-              localStorage.moduleId = 300;
+              this.$store.commit("SET_USER", JSON.stringify(res.data.userInfo));
+              localStorage.userId = res.data.userInfo.userId;
+              localStorage.username = res.data.userInfo.username;
+              // localStorage.userMobile = res.data.data.merchantMobile;
+              // localStorage.merchantId_ID = res.data.data.merchantId;
+              // localStorage.moduleId = 300;
               //转跳
               setTimeout(() => {
+                // console.log(1)
                 //直接同步会使得alertShow显示不出来
                 this.$router.push("/index/sys-index");
               }, 900);
             } else {
               //验证失败
               this.text = "用户名密码不匹配";
-              this.alertShow();
             }
           })
           .catch(err => {
-            // console.log(err);
+            console.log(err);
+            this.msg(err, "error");
           });
       }
+    },
+    register() {
+      this.$axios({
+        method: "post",
+        // url: this.$api.register,
+        url: '68.168.131.20/merchant/login',
+        data: {
+          username: this.user,
+          password: this.password
+        }
+      })
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => {
+          console.log(err);
+          this.msg(err, "error");
+        });
     }
   }
 };

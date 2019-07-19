@@ -38,8 +38,8 @@
         </el-form-item>
         <el-form-item label="是否显示" prop="showStatus">
           <el-radio-group v-model="ruleForm.showStatus">
-            <el-radio :label="0">显示</el-radio>
-            <el-radio :label="1">不显示</el-radio>
+            <el-radio :label="true">显示</el-radio>
+            <el-radio :label="false">不显示</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="分类图标" prop="typeIcon">
@@ -109,10 +109,11 @@ export default {
     }
     //分类数据
     this.ruleForm.parentId = this.$route.query.parentId;
-    this.$axios("api/merchantGoodsType/query_goods_type_tree")
+    this.$axios(this.$api.type_list)
       .then(res => {
         // console.log(res);
-        this.typeList = [...this.typeList, ...res.data.data];
+        // this.typeList = [...this.typeList, ...res.data.data];
+        this.typeList = this.typeList.concat(res.data);
       })
       .catch(err => {
         // console.log(err);
@@ -121,7 +122,7 @@ export default {
   },
   computed: {
     titleTxt() {
-      return this.isAdd ? "新增下级" : "修改该级";
+      return this.isAdd ? "新增分类" : "修改该级";
     }
   },
   methods: {
@@ -129,13 +130,13 @@ export default {
     getFormData() {
       this.$axios({
         method: "post",
-        url: "api/merchantGoodsType/merchant_goods_type_by_id",
+        url: this.$api.type_detail,
         data: {
           id: this.$route.query.id
         }
       })
         .then(res => {
-          // console.log(res);
+          console.log(res);
           // this.ruleForm = res.data.data;
           this.ruleForm.id = res.data.data.id;
           this.ruleForm.typeName = res.data.data.typeName;
@@ -148,13 +149,13 @@ export default {
         })
         .catch(err => {
           // console.log(err);
-          this.msg(err, "error");
+          // this.msg(err, "error");
         });
     },
     // 上传图片
     uploadFile(content) {
       this.uploadImg(content.file).then(res => {
-        // console.log(res);
+        console.log(res);
         this.ruleForm.typeIcon = res.imgUrl;
       });
     },
@@ -166,12 +167,12 @@ export default {
           if (this.isAdd) {
             //判断是否新增
             this.submitForm(
-              "api/merchantGoodsType/merchant_add_goods_type",
+              this.$api.type_add,
               this.ruleForm
             );
           } else {
             this.submitForm(
-              "api/merchantGoodsType/merchant_goods_type_update",
+              this.$api.type_update,
               this.ruleForm
             );
           }

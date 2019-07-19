@@ -23,15 +23,15 @@
         <p>确认密码</p>
       </div>
       <div class="right">
-        <el-input v-model="user.merchantName" disabled/>
+        <el-input v-model="ruleForm.username" disabled/>
         <!-- <el-input v-model="email" disabled="true"/> -->
-        <el-input v-model="oldPw"/>
-        <el-input v-model="newPw"/>
+        <el-input v-model="ruleForm.oldPw"/>
+        <el-input v-model="ruleForm.newPw"/>
         <el-input v-model="cfmPw"/>
       </div>
     </div>
     <div class="btn-wrapper">
-      <el-button type="primary">提交</el-button>
+      <el-button type="primary" @click="changePw">提交</el-button>
     </div>
   </dir>
 </template>
@@ -45,8 +45,11 @@ export default {
     return {
       user: {},
       logo: "",
-      oldPw: "",
-      newPw: "",
+      ruleForm: {
+        username: '',
+        oldPw: "",
+        newPw: ""
+      },
       cfmPw: ""
     };
   },
@@ -58,23 +61,50 @@ export default {
     //获取data
     getFormData() {
       //从服务器取
-      // this.$axios({
-      //   method: "post",
-      //   url: "api/..."
-      //   // data: {
-      //   //   merchantId: JSON.parse(localStorage.user).merchantId
-      //   // }
-      // })
-      //   .then(res => {
-      //     // console.log(res);
-      //     // this.ruleForm = res.data.data;
-      //   })
-      //   .catch(err => {
-      //     // console.log(err);
-      //   });
-      //直接从本地取
-      this.user = JSON.parse(this.$store.state.user);
-      this.logo = JSON.parse(this.$store.state.user).imgUrl + JSON.parse(this.$store.state.user).merchantLogo;
+      this.$axios({
+        method: "post",
+        url: this.$api.login_detail,
+        data: {
+          userId: localStorage.userId
+        }
+      })
+        .then(res => {
+          console.log(res);
+          // Object.assign(this.ruleForm, res.data);
+          this.ruleForm.username = res.data.username;
+        })
+        .catch(err => {
+          // console.log(err);
+        });
+      // //直接从本地取
+      // this.user = JSON.parse(this.$store.state.user);
+      // this.logo = JSON.parse(this.$store.state.user).imgUrl + JSON.parse(this.$store.state.user).merchantLogo;
+    },
+    changePw() {
+      if (
+        this.ruleForm.oldPw &&
+        this.ruleForm.newPw &&
+        this.ruleForm.oldPw !== this.ruleForm.newPw &&
+        this.cfmPw === this.ruleForm.newPw
+      ) {
+        Object.assign(this.ruleForm, { userId: localStorage.userId });
+        this.$axios({
+          method: "post",
+          url: this.$api.login_change,
+          data: this.ruleForm
+        })
+          .then(res => {
+            if(res.data == '修改成功') this.msg(res.data)
+            this.$router.go(0)
+            // this.ruleForm = res.data;
+            // console.log(this.ruleForm);
+          })
+          .catch(err => {
+            // console.log(err);
+          });
+      } else {
+        this.msg("请重新输入密码", "error");
+      }
     },
     // 上传头像
     uploadFile(content) {

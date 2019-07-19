@@ -49,7 +49,7 @@ export default {
         detail: "",
         id: "",
         mchId: "",
-        merchantId: "",
+        userId: JSON.parse(localStorage.user).userId || localStorage.userId,
         name: "",
         remark1: "",
         remark2: "",
@@ -79,7 +79,10 @@ export default {
     getFormData() {
       this.$axios({
         method: "post",
-        url: "api/merchant_pay_mode/query"
+        url: this.$api.pay,
+        data: {
+          userId: JSON.parse(localStorage.user).userId || localStorage.userId
+        }
       })
         .then(res => {
           // console.log(res);
@@ -94,11 +97,11 @@ export default {
       this.$refs[formName].validate(valid => {
         //先检验表单
         if (valid) {
-          this.submitForm("api/merchant_pay_mode/update", this.ruleForm);
+          this.submitForm(this.$api.pay_update, this.ruleForm);
           this.msg("提交成功");
-          this.$nextTick(() => {
+          // this.$nextTick(() => {
             this.getFormData();
-          });
+          // });
         } else {
           this.msg("error submit!!", "error");
           return false;

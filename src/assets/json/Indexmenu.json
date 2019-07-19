@@ -140,21 +140,6 @@
         }]
     },
     {
-        "title": "促销",
-        "name": "sale",
-        "path": "/sale",
-        "child": [{
-            "sub": "头部类目",
-            "menu": [{
-                "title": "头部列表",
-                "name": "head-list"
-            }, {
-                "title": "添加头部",
-                "name": "add-head"
-            }]
-        }]
-    },
-    {
         "title": "运营",
         "name": "operation",
         "path": "/",

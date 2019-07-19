@@ -14,7 +14,7 @@ export default {
             sort: [], //排序
             nowSort: '', //当前排序
             tableData: [],
-            pageSize: 10, //每页数据量
+            pageSize: 5, //每页数据量
             totalPage: 0, //总页数
             dataCount: 0, //总数据量
             currentPage: 1, //当前页数
@@ -35,22 +35,22 @@ export default {
             let totalForm = Object.assign(form, extraData);
             //发送请求
             this.$axios({
-                    method: "post",
-                    url: url,
-                    // // type: "form",
-                    data: totalForm,
-                    // //使用qs模块转化data为form格式提交
-                    // transformRequest: [
-                    //     function (data) {
-                    //         data = Qs.stringify(data);
-                    //         return data;
-                    //     }
-                    // ],
-                    // // 修改header为formdata格式
-                    // headers: {
-                    //     "Content-Type": "application/x-www-form-urlencoded"
-                    // }
-                })
+                method: "post",
+                url: url,
+                // // type: "form",
+                data: totalForm,
+                // //使用qs模块转化data为form格式提交
+                // transformRequest: [
+                //     function (data) {
+                //         data = Qs.stringify(data);
+                //         return data;
+                //     }
+                // ],
+                // // 修改header为formdata格式
+                // headers: {
+                //     "Content-Type": "application/x-www-form-urlencoded"
+                // }
+            })
                 // .then(res => {
                 //     // console.log(res);
                 // })
@@ -74,9 +74,9 @@ export default {
                 this.checkAll = false;
                 this.isIndeterminate =
                     this.tableSelection.length > 0 &&
-                    this.tableSelection.length < this.tableData.length ?
-                    true :
-                    false;
+                        this.tableSelection.length < this.tableData.length ?
+                        true :
+                        false;
             }
         },
         //全选
@@ -109,16 +109,20 @@ export default {
                 //上传图片
                 this.$axios({
                     method: 'post',
-                    url: 'api/merchant/upload_file',
+                    url: this.$api.upload,
                     data: formData,
                     type: "form",
                     headers: {
                         "Content-Type": "multipart/form-data" //* 和json文字数据不一样
                     },
                 }).then((res) => {
-                    // console.log(res);
+                    // console.log('res1', res);
+                    let api = res.data.data.imgUrl;
+                    if (process.env.NODE_ENV === 'development') api += '/api';
                     resolve({
-                        imgUrl: res.data.data.imgUrl + res.data.data.image
+                        imgUrl: api + res.data.data.path + res.data.data.image,
+                        id: res.data.data._id
+                        // imgUrl: 'http://localhost:8080/api/static/' + res.data.data.image
                     })
                 }).catch(err => {
                     // console.log(err);
@@ -172,7 +176,14 @@ export default {
             setTimeout(() => {
                 this.$router.back();
             }, 500);
-        }
+        },
+        //调整图片url
+        adjustImg(obj) {
+            if (process.env.NODE_ENV === 'development') {
+                return obj.imgUrl + '/api' + obj.path + obj.image 
+            }
+            return obj.imgUrl + obj.path + obj.image; 
+        },
 
     },
 }

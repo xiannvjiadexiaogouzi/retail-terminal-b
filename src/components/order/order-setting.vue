@@ -64,10 +64,8 @@ export default {
       ruleForm: {
         commentEndTime: "",
         finalEndTime: "",
-        id: "",
-        merchantId: "",
+        // merchantId: "",
         normalEndpayTime: "",
-        seckillEndpayTime: "",
         sendEndTime: ""
       },
       rules: {
@@ -94,14 +92,14 @@ export default {
     getFormData() {
       this.$axios({
         method: "post",
-        url: "api/merchant_order_set/queryOrderSet",
-        data: {
-          merchantId: JSON.parse(localStorage.user).merchantId
-        }
+        url: this.$api.order_set
+        // data: {
+        //   merchantId: JSON.parse(localStorage.user).merchantId
+        // }
       })
         .then(res => {
           // console.log(res);
-          this.ruleForm = res.data.data;
+          this.ruleForm = res.data;
         })
         .catch(err => {
           this.msg(err, "error");
@@ -114,17 +112,12 @@ export default {
         //先检验表单
         if (valid) {
           this.submitForm(
-            "api/merchant_order_set/add_or_update",
+            this.$api.order_set,
             this.ruleForm
           );
-          this.$message({
-            message: "提交成功",
-            type: "success",
-            showClose: true,
-            duration: 2500
-          });
+          this.msg();
           setTimeout(() => {
-            this.$router.back();
+            this.getFormData();
           }, 3000);
         } else {
           this.msg("error submit!!", "error");

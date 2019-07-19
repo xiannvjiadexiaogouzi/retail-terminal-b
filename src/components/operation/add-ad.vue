@@ -32,8 +32,8 @@
         </el-form-item>
         <el-form-item label="是否上线" prop="online">
           <el-radio-group v-model="ruleForm.online">
-            <el-radio :label="'1'">上线</el-radio>
-            <el-radio :label="'0'">下线</el-radio>
+            <el-radio :label="true">上线</el-radio>
+            <el-radio :label="false">下线</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="广告图片" prop="typeIcon">
@@ -90,8 +90,7 @@ export default {
         adPosition: "",
         id: "",
         online: "",
-        remark: "",
-        status: ""
+        remark: ""
       },
       rules: {
         adName: [
@@ -128,13 +127,13 @@ export default {
     getFormData() {
       this.$axios({
         method: "post",
-        url: "api/merchant_ad/get_single_merchant_ad",
+        url: this.$api.ad_detail,
         data: {
           id: this.$route.query.adId
         }
       })
         .then(res => {
-          //   console.log(res);
+          console.log(res);
           this.ruleForm = res.data.data;
           this.adLinkId2Name(res.data.data);
         })
@@ -153,7 +152,7 @@ export default {
     adLinkId2Name(data) {
       this.$axios({
         method: "post",
-        url: "api/merchantGoods/merchant_goods_by_id",
+        url: this.$api.product_detail,
         data: {
           id: data.adLink
         }
@@ -170,7 +169,7 @@ export default {
     adLinkList(queryStr, cb) {
       this.$axios({
         method: "post",
-        url: "api/merchantGoods/merchant_goods_list_page",
+        url: this.$api.product_list,
         data: {
           currentPage: 1,
           pageSize: 100,
@@ -178,7 +177,7 @@ export default {
         }
       }).then(res => {
         console.log(res);
-        let arr = res.data.data.list;
+        let arr = res.data.data;
         arr.forEach((val, index, arr) => {
           val.value = val.goodsName;
         });
@@ -199,15 +198,13 @@ export default {
         if (valid) {
           if (this.isAdd) {
             //判断是否新增
-            this.submitForm("api/merchant_ad/add_merchant_ad", this.ruleForm, {
+            this.submitForm(this.$api.ad_add, this.ruleForm, {
               adLink: this.adLinkId
             });
           } else {
-            this.submitForm(
-              "api/merchant_ad/change_merchant_ad",
-              this.ruleForm,
-              { adLink: this.adLinkId }
-            );
+            this.submitForm(this.$api.ad_update, this.ruleForm, {
+              adLink: this.adLinkId
+            });
           }
           this.msg("提交成功");
           setTimeout(() => {

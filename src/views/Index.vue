@@ -21,14 +21,24 @@
           <span class="icon-avatar"/>
           <span class="avatar-name">admin</span>
         </div>
-        <div class="admin-info-wrapper" v-if="showAdmin" @mouseover="showAdmin=true" @mouseout="showAdmin=false">
+        <div
+          class="admin-info-wrapper"
+          v-if="showAdmin"
+          @mouseover="showAdmin=true"
+          @mouseout="showAdmin=false"
+        >
           <admin-info/>
         </div>
         <div class="status-wrapper">
           <span class="icon-home" @click="$router.push('/index/sys-index')"/>
           <span class="icon-msg" @mouseover="showMsg=true"/>
-          <div class="msg-warn">50</div>
-          <div class="new-message-wrapper" v-show="showMsg" @mouseover="showMsg=true" @mouseout="showMsg=false">
+          <div class="msg-warn">33</div>
+          <div
+            class="new-message-wrapper"
+            v-show="showMsg"
+            @mouseover="showMsg=true"
+            @mouseout="showMsg=false"
+          >
             <new-message/>
           </div>
           <span class="icon-close" @click="logout"/>
@@ -95,7 +105,7 @@ export default {
       return this.indexMenu[this.nowIndex];
     },
     //侧边active菜单
-    activeMenu(){
+    activeMenu() {
       return this.$store.getters.activeMenu;
     }
   },
@@ -134,7 +144,13 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-        this.$router.push("/");
+        this.$axios({
+          method: "get",
+          url: this.$api.logout,
+        }).then(res => {
+          console.log(res);
+          this.$router.push("/");
+        });
       });
       // this.$store.commit("CLEAR_USER");
     }

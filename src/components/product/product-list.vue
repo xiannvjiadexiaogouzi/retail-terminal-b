@@ -95,9 +95,7 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="56"/>
-        <el-table-column label="编号" width>
-          <template slot-scope="scope">{{scope.row.id}}</template>
-        </el-table-column>
+        <el-table-column prop="id" label="编号" width />
         <el-table-column prop="name" label="商品图片" width="130">
           <template slot-scope="scope">
             <img :src="transImg(scope.row.goodsImg)">
@@ -106,7 +104,7 @@
         <el-table-column prop="address" label="商品名称" width>
           <template slot-scope="scope">
             <p>{{scope.row.goodsName}}</p>
-            <p>品牌：{{scope.row.brandName}}</p>
+            <p>品牌：{{scope.row.brand.name}}</p>
           </template>
         </el-table-column>
         <el-table-column prop="name" label="价格/货号" width="150">
@@ -115,12 +113,12 @@
             <p>货号：{{scope.row.goodsNo}}</p>
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="标签" width>
+        <el-table-column prop="name" label="上架" width>
           <template slot-scope="scope">
             <el-switch
               v-model="scope.row.status"
-              :inactive-value="0"
-              :active-value="1"
+              :inactive-value="false"
+              :active-value="true"
               active-color="#5BC0BF"
               @change="handleShowStatus($event,scope.row)"
             />
@@ -296,18 +294,18 @@ export default {
   created() {
     this.getTableData(1);
     //分类数据
-    this.$axios("api/merchantGoodsType/query_goods_type_tree")
+    this.$axios(this.$api.type_list)
       .then(res => {
         // console.log(res);
-        this.productTypes = res.data.data;
+        this.productTypes = res.data;
       })
       .catch(err => {
         this.msg(err, "error");
       });
     //品牌数据
-    this.$axios("api/merchant_goods_brand/query_list")
+    this.$axios(this.$api.brand_list)
       .then(res => {
-        this.brandList = res.data.data;
+        this.brandList = res.data;
       })
       .catch(err => {
         this.msg(err, "error");
@@ -317,8 +315,9 @@ export default {
   methods: {
     //获取图片url
     transImg(src) {
+      console.log(src)
       if (src) {
-        return src.split(",")[0];
+        return this.adjustImg(src[0]);
       }
     },
     statusTxt(status) {
@@ -346,7 +345,7 @@ export default {
       this.loading = true;
       this.$axios({
         method: "post",
-        url: "api/merchantGoods/merchant_goods_list_page",
+        url: this.$api.product_list,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
@@ -357,10 +356,10 @@ export default {
         }
       })
         .then(res => {
-          // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          console.log(res);
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
           this.loading = false;
         })
         .catch(err => {
@@ -369,18 +368,18 @@ export default {
     },
     //上架
     handleShowStatus($event, data) {
-      let show = $event ? 1 : 0;
-      if (show) {
+      if ($event) {
         //变化后的值
         this.$axios({
           method: "post",
-          url: "api/merchantGoods/merchant_goods_put",
+          url: this.$api.product_put, //上架
           data: {
             id: data.id
           }
         })
           .then(() => {
             this.getTableData();
+            this.msg('上架成功');
           })
           .catch(err => {
             this.msg(err, "error");
@@ -388,13 +387,14 @@ export default {
       } else {
         this.$axios({
           method: "post",
-          url: "api/merchantGoods/merchant_goods_pull",
+          url: this.$api.product_pull, //下架
           data: {
             id: data.id
           }
         })
           .then(() => {
             this.getTableData();
+            this.msg('下架成功');
           })
           .catch(err => {
             this.msg(err, "error");
@@ -412,7 +412,7 @@ export default {
       //获取商品信息
       this.$axios({
         method: "post",
-        url: "api/merchantGoods/merchant_goods_by_id",
+        url: this.$api.product_detail,
         data: {
           id: id
         }
@@ -489,7 +489,7 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchantGoods/delete_batch",
+          url: this.$api.product_delete,
           data: ids
         })
           .then(() => {

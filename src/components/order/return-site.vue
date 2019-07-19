@@ -96,18 +96,18 @@ export default {
       //表格数据
       this.$axios({
         method: "post",
-        url: "api/return_send/query_for_page",
+        url: this.$api.return_site,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
-          merchantId: JSON.parse(localStorage.user).merchantId
+          // merchantId: JSON.parse(localStorage.user).merchantId
         }
       })
         .then(res => {
           // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           this.msg(err, "error");
@@ -123,8 +123,8 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/return_send/delete",
-          data: { ids: ids }
+          url: this.$api.return_site_delete,
+          data: ids
         })
           .then(() => {
             this.msg("删除成功");

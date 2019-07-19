@@ -28,10 +28,10 @@
       >
         <el-table-column prop="operateTime" label="时间" width/>
         <el-table-column prop="ip" label="IP" width/>
-        <el-table-column prop="region" label="地区" width>
-          <template slot-scope="scope">{{region(scope.row.description)}}</template>
+        <el-table-column prop="des" label="地区" width>
+          <template slot-scope="scope">{{region(scope.row.des)}}</template>
         </el-table-column>
-        <el-table-column prop="pack" label="浏览器" width/>
+        <el-table-column prop="browser" label="浏览器" width/>
       </el-table>
       <!-- 表格批量操作+页码 -->
       <footer>
@@ -76,36 +76,38 @@ export default {
     getTableData(page) {
       this.$axios({
         method: "post",
-        url: "api/merchant/get_merchant_login_info_list",
+        url: this.$api.login_log,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
-          orderBy: "operate_time desc"
+          // orderBy: "operateTime",
+          username: '13932493200',
         },
-        // type: "form",
-        //使用qs模块转化data为form格式提交
-        transformRequest: [
-          function(data) {
-            data = Qs.stringify(data);
-            return data;
-          }
-        ],
-        // 修改header为formdata格式
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
+        // // type: "form",
+        // //使用qs模块转化data为form格式提交
+        // transformRequest: [
+        //   function(data) {
+        //     data = Qs.stringify(data);
+        //     return data;
+        //   }
+        // ],
+        // // 修改header为formdata格式
+        // headers: {
+        //   "Content-Type": "application/x-www-form-urlencoded"
+        // }
       })
         .then(res => {
-          // console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          console.log(res);
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           this.msg(err, "error");
         });
     },
     region(data) {
+      if(!data) return '';
       let re = {};
       if (data.length > 2) {
         re = JSON.parse(data).data;

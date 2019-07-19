@@ -56,28 +56,30 @@ export default {
     getTableData(page) {
       this.$axios({
         method: "post",
-        url: "api/merchant/get_merchant_login_info_list",
+        url: this.$api.login_info,
+        // url: "api/merchant/get_merchant_login_info_list",
         data: {
-          currentPage: page || this.currentPage,
-          pageSize: this.pageSize,
-          orderBy: "operate_time desc"
+          username: '13932493200',
+          currentPage: page || 1,
+          pageSize: 2 || this.pageSize,
+          // orderBy: "operate_time desc"
         },
-        type: "form",
-        //使用qs模块转化data为form格式提交
-        transformRequest: [
-          function(data) {
-            data = Qs.stringify(data);
-            return data;
-          }
-        ],
-        // 修改header为formdata格式
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
+        // type: "form",
+        // //使用qs模块转化data为form格式提交
+        // transformRequest: [
+        //   function(data) {
+        //     data = Qs.stringify(data);
+        //     return data;
+        //   }
+        // ],
+        // // 修改header为formdata格式
+        // headers: {
+        //   "Content-Type": "application/x-www-form-urlencoded"
+        // }
       })
         .then(res => {
-          this.loginInfo = res.data.data.list[0];
-          this.lastTime = res.data.data.list[1].operateTime;
+          this.loginInfo = res.data.data[0];
+          this.lastTime = res.data.data[1].operateTime;
         })
         .catch(err => {
           this.msg(err, "error");

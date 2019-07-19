@@ -10,7 +10,7 @@
     </div>
     <!-- 表单本体 -->
     <div class="main-wrapper">
-      <el-steps :active="tableData[0].status" finish-status="success" align-center>
+      <el-steps v-if="tableData[0]" :active="tableData[0].status" finish-status="success" align-center>
         <el-step title="提交订单" :description="tableData[0].creatTime"/>
         <el-step title="支付订单" :description="tableData[0].payTime"/>
         <el-step title="平台发货" :description="tableData[0].sendTime"/>
@@ -20,7 +20,7 @@
       <div class="product-list-wrapper no-bottom">
         <header class="table-header">
           <div class="table-header-left">
-            <span>
+            <span v-if="tableData[0]">
               <span class="el-icon-warning"/>
               当前订单状态：{{statusTxt}}
             </span>
@@ -28,7 +28,7 @@
           <div class="table-header-right">
             <el-button @click="showDialog(1)">修改收货人信息</el-button>
             <el-button @click="showDialog(0)">备注订单</el-button>
-            <el-button v-if="tableData[0].status == 1">关闭订单</el-button>
+            <el-button v-if="tableData[0] && tableData[0].status == 1">关闭订单</el-button>
           </div>
         </header>
       </div>
@@ -47,7 +47,6 @@
           style="width: 100%"
           @selection-change="handleSelectionChange"
         >
-          <el-table-column prop="id" label="订单ID" width/>
           <el-table-column prop="code" label="订单编号" width/>
           <el-table-column prop="mobilePhone" label="用户账户" width>
             <template slot-scope="">{{$route.query.mobilePhone}}</template>
@@ -59,7 +58,7 @@
             <template slot-scope="">微信小程序</template>
           </el-table-column>
           <el-table-column prop="type" label="订单类型" width>
-            <template slot-scope="scope">{{scope.row.type == 1 ? '普通订单' : '秒杀订单'}}</template>
+            <template slot-scope="scope">{{scope.row.orderType == 1 ? '普通订单' : '秒杀订单'}}</template>
           </el-table-column>
           <el-table-column prop="sendCompany" label="配送方式" width/>
           <el-table-column prop="sendCode" label="物流单号" width/>
@@ -82,7 +81,7 @@
         >
           <el-table-column prop="receiver" label="收货人" width/>
           <el-table-column prop="phone" label="手机号码" width/>
-          <el-table-column prop label="邮政编码" width/>
+          <el-table-column prop='' label="邮政编码" width/>
           <el-table-column prop="address" label="收货地址" width/>
         </el-table>
       </div>
@@ -95,14 +94,14 @@
         <!-- 表格本体 -->
         <el-table
           ref="productTable"
-          :data="tableData[0].details"
+          :data="goodsArr"
           tooltip-effect="dark"
           style="width: 100%"
           @selection-change="handleSelectionChange"
         >
           <el-table-column prop="GoodsPic" label="商品图片" width>
             <template slot-scope="scope">
-              <img :src="scope.row.goodsPic" alt>
+              <img :src="adjustImg(scope.row.goodsImg[0])" alt>
             </template>
           </el-table-column>
           <el-table-column prop="goodsName" label="商品名称" width/>
@@ -110,7 +109,7 @@
           <el-table-column prop="goodsPrice" label="价格" width/>
           <el-table-column prop="goodsDesc" label="属性" width/>
           <el-table-column prop="buyNum" label="数量" width/>
-          <el-table-column prop="goodsBrand" label="品牌" width/>
+          <el-table-column prop="brandName" label="品牌" width/>
           <el-table-column prop="totalMoney" label="总金额" width/>
         </el-table>
       </div>
@@ -128,12 +127,12 @@
           style="width: 100%"
           @selection-change="handleSelectionChange"
         >
-          <el-table-column prop="totalMoeny" label="商品合计" width/>
-          <el-table-column prop="code" label="运费" width>
+          <el-table-column prop="totalNum" label="商品合计" width/>
+          <el-table-column prop="sendCost" label="运费" width>
             <template slot-scope="">包邮</template>
           </el-table-column>
-          <el-table-column prop="totalMoeny" label="订单总金额" width/>
-          <el-table-column prop="totalMoeny" label="应付款金额" width/>
+          <el-table-column prop="totalMoney" label="订单总金额" width/>
+          <el-table-column prop="totalMoney" label="应付款金额" width/>
         </el-table>
       </div>
     </div>
@@ -145,7 +144,6 @@
         ref="ruleForm"
         label-width="100px"
         class="demo-ruleForm"
-        v-if="dialogStatus == 1"
       >
         <!-- 修改收货人信息 -->
         <el-form-item label="收货人姓名" prop="receiver">
@@ -193,11 +191,11 @@ export default {
       dialogVisible: false,
       dialogStatus: 1,
       ruleForm: {
-        id: "",
         receiver: "",
         phone: "",
         address: ""
       },
+      goodsArr:[],
       rules: {
         receiver: [
           { required: true, message: "请输入收件人", trigger: "blur" }
@@ -237,7 +235,7 @@ export default {
         case 6:
           return "已完成";
           break;
-        case 20:
+        case 7:
           return "已删除";
           break;
       }
@@ -251,19 +249,22 @@ export default {
     getTableData() {
       this.$axios({
         method: "post",
-        url: "api/merchant_order/query_By_Id",
+        url: this.$api.order_detail,
         data: {
-          id: this.$route.query.orderId,
-          merchantId: JSON.parse(localStorage.user).merchantId
+          code: this.$route.query.orderId,
+          // merchantId: JSON.parse(localStorage.user).merchantId
         }
       })
         .then(res => {
           console.log(res);
-          this.tableData.push(res.data.data);
-          this.ruleForm.id = res.data.data.id;
-          this.ruleForm.receiver = res.data.data.receiver;
-          this.ruleForm.phone = res.data.data.phone;
-          this.ruleForm.address = res.data.data.address;
+          this.tableData.push(res.data);
+          this.goodsArr.push(res.data.goods);
+          this.goodsArr[0].buyNum = res.data.totalNum;
+          this.goodsArr[0].totalMoney = res.data.totalMoney;
+          this.ruleForm.code = res.data.code;
+          this.ruleForm.receiver = res.data.receiver;
+          this.ruleForm.phone = res.data.phone;
+          this.ruleForm.address = res.data.address;
         })
         .catch(err => {
           this.msg(err, "error");
@@ -279,10 +280,10 @@ export default {
       this.$refs[formName].validate(valid => {
         //先检验表单
         if (valid) {
-          this.submitForm("api/merchant_order/updateOrder", this.ruleForm);
+          this.submitForm(this.$api.order_update, this.ruleForm);
           this.msg("提交成功");
           setTimeout(() => {
-            this.$router.back();
+            this.$router.push({name: 'order-list'});
           }, 50);
         } else {
           this.msg("error submit!!", "error");

@@ -117,7 +117,7 @@ export default {
     getTableData(page) {
       this.$axios({
         method: "post",
-        url: "api/merchant_goods_galleries/query_for_page",
+        url: this.$api.pics,
         data: {
           currentPage: page || this.currentPage,
           pageSize: this.pageSize,
@@ -126,9 +126,9 @@ export default {
       })
         .then(res => {
           console.log(res);
-          this.tableData = res.data.data.list;
-          this.totalPage = res.data.data.totalPage;
-          this.dataCount = res.data.data.totalCount;
+          this.tableData = res.data.data;
+          this.totalPage = res.data.totalPage;
+          this.dataCount = res.data.totalCount;
         })
         .catch(err => {
           console.log(err);
@@ -139,7 +139,7 @@ export default {
       let show = $event ? 1 : 0;
       this.$axios({
         method: "post",
-        url: "api/merchant_goods_brand/update",
+        url: this.$api.pics_update,
         data: {
           id: data.id,
           name: data.name,
@@ -169,7 +169,7 @@ export default {
       }).then(() => {
         this.$axios({
           method: "post",
-          url: "api/merchant_goods_galleries/delete_batch",
+          url: this.$api.pics_delete,
           data: ids
         })
           .then(() => {

@@ -59,7 +59,7 @@ export default {
     getFormData() {
       this.$axios({
         method: "post",
-        url: "api/merchant_pay_mode/query",
+        url: this.$api.pay,
         data: {
           merchantId: JSON.parse(localStorage.user).merchantId
         }
@@ -78,26 +78,26 @@ export default {
         this.msg("请上传p12文件", "error");
         return;
       } else {
-        let formData = new FormData(); //创建新的formdata对象
-        formData.append("file", content.file); //向formdata中插入键值对(数据)\
-        //上传文件
-        this.$axios({
-          method: "post",
-          url: "api/file/file_upload",
-          data: formData,
-          type: "form",
-          headers: {
-            "Content-Type": "multipart/form-data" //* 和json文字数据不一样
-          }
-        })
-          .then(res => {
+        // let formData = new FormData(); //创建新的formdata对象
+        // formData.append("file", content.file); //向formdata中插入键值对(数据)\
+        // //上传文件
+        // this.$axios({
+        //   method: "post",
+        //   url: this.$api.upload,
+        //   data: formData,
+        //   type: "form",
+        //   headers: {
+        //     "Content-Type": "multipart/form-data" //* 和json文字数据不一样
+        //   }
+        // })
+        //   .then(res => {
             this.msg("上传成功");
-            // console.log(res);
-            //根据res来更改当前证书数据
-          })
-          .catch(err => {
-            this.msg(err, "error");
-          });
+        //     // console.log(res);
+        //     //根据res来更改当前证书数据
+        //   })
+        //   .catch(err => {
+        //     this.msg(err, "error");
+        //   });
       }
     },
     //提交表单
