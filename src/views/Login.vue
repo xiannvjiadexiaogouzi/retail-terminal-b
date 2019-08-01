@@ -1,21 +1,15 @@
 <template>
-  <div class="login-vue">
-    <div class="login-bg"></div>
-    <div class="login-wrapper">
-      <div class="login">
-        <div class="title">后台业务管理系统</div>
-        <el-input v-model="user" placeholder="请输入用户名称" clearable />
-        <el-input type="password" v-model="password" placeholder="请输入登录密码" clearable />
-        <transition name="alert-trans">
-          <el-alert type="warning" center show-icon v-if="showAlert">{{text}}</el-alert>
-        </transition>
-        <el-button @click="loginIn">登 录</el-button>
-        <!-- <el-button @click="register">注 册</el-button> -->
-      </div>
-      <footer>
-        <p>copyright....</p>
-      </footer>
+  <div class="login-wrapper">
+    <div class="login">
+      <div class="title">后台业务管理系统</div>
+      <el-input v-model="user" placeholder="请输入用户名称" clearable />
+      <el-input type="password" v-model="password" placeholder="请输入登录密码" clearable />
+      <button @click="loginIn">登 录</button>
+      <!-- <el-button @click="register">注 册</el-button> -->
     </div>
+    <footer>
+      <p>copyright....</p>
+    </footer>
   </div>
 </template>
 
@@ -29,7 +23,6 @@ export default {
   mixins: [mixin],
   data() {
     return {
-      showAlert: false,
       user: "13932493200",
       password: "000000",
       text: ""
@@ -124,7 +117,7 @@ export default {
       this.$axios({
         method: "post",
         // url: this.$api.register,
-        url: '68.168.131.20/merchant/login',
+        url: "68.168.131.20/merchant/login",
         data: {
           username: this.user,
           password: this.password
@@ -145,75 +138,94 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/scss/mixin.scss";
 
-div.login-bg {
-  position: absolute;
-  height: 100vh;
-  width: 100%;
-  @include bg("../assets/img/login/login-bg.png");
-}
-
 div.login-wrapper {
-  // @include bg("../assets/img/login/login-bg.png");
-
+  background-image: linear-gradient(
+    125deg,
+    #2c3e50,
+    #27ae60,
+    #2980b9,
+    #e74c3c,
+    #8e44ad
+  );
+  background-size: 400%;
+  animation: bganimation 60s linear infinite;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   width: 100%;
+
   div.login {
-    width: 350px;
-    height: 389px;
+    padding: 20px 5px;
+    width: 400px;
+    height: 400px;
+    border-radius: 5px;
     position: relative;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
     div.title {
       width: 100%;
-      margin-bottom: 57px;
+      // margin-bottom: 57px;
       text-align: center;
       font-size: 27px;
       font-weight: 700;
       color: rgb(255, 255, 255);
     }
-    .el-alert {
-      position: absolute;
-      width: 100%;
-      height: 45px;
-      bottom: 60px;
-      background: rgb(130, 230, 230);
-      color: rgb(255, 255, 255);
-      font-size: 18px;
-    }
-    .el-button {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      z-index: 2;
-      margin-top: 65px;
-      width: 100%;
+    button {
+      // position: absolute;
+      // bottom: 0;
+      // left: 0;
+      // z-index: 2;
+      // margin-top: 65px;
+      margin: 15px 0;
+      border-radius: 5px;
+      width: 80%;
       height: 60px;
-      background: $blue;
+      background: transparent;
       font-size: 21px;
       color: rgb(255, 255, 255);
-      border: none;
+      border: 2px $blue solid;
+      outline: 0;
+      &:hover{
+        background: $rule-blue;
+        cursor: pointer;
+      }
+      &{
+        background: $blue;
+      }
     }
-    .alert-trans-enter {
-      // .alert-trans-leave-to {
-      opacity: 0;
-      -webkit-transform: translateY(60px);
-      transform: translateY(60px);
-    }
-    .alert-trans-enter-active {
-      // .alert-trans-leave-active {
-      transition: transform 1s ease;
-    }
+  }
+
+  footer {
+    position: absolute;
+    bottom: 6.5%;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    font-size: 20px;
+    color: rgb(255, 255, 255);
   }
 }
 
-footer {
-  position: absolute;
-  bottom: 6.5%;
-  max-width: 100%;
-  display: flex;
-  justify-content: center;
-  font-size: 20px;
-  color: rgb(255, 255, 255);
+@keyframes bganimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 </style>
+
+<style scoped>
+.login-wrapper .login .el-input {
+  width: 80%;
+}
+</style>
+
